@@ -1,0 +1,34 @@
+title: "Ontological Relativity Theory"
+author: "Jeroen Douwes"
+copyright: "2025"
+logo: ""
+
+execute:
+  execute_notebooks: force
+  timeout: 300
+
+launch_buttons:
+  notebook_interface: classic
+
+parse:
+  myst_enable_extensions:
+    - amsmath
+    - dollarmath
+    - colon_fence
+
+html:
+  use_issues_button: false
+  use_repository_button: true
+  use_edit_page_button: false
+  home_page_in_navbar: true
+
+repository:
+  url: https://github.com/jeroendouwes/ontologicalphysics
+  branch: main
+  path_to_book: book/en
+
+sphinx:
+  config:
+    mathjax_path: https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+    html_js_files:
+      - https://cdn.plot.ly/plotly-2.35.2.min.js

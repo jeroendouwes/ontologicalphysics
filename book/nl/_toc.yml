@@ -1,0 +1,8 @@
+format: jb-book
+root: index
+chapters:
+  - file: 01_speciale_relativiteit
+  - file: 02_zwaartekracht_basis
+  - file: 03_zwaartekracht_gevorderd
+  - file: 04_kosmologie
+  - file: 05_kwantummechanica

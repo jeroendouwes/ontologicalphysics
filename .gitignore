@@ -1,0 +1,19 @@
+# Jupyter Book build output
+book/en/_build/
+book/nl/_build/
+_site/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
