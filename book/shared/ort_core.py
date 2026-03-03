@@ -1,11 +1,12 @@
 """
-SpaceTime Core — Python port of all Java physics classes.
+ORT Core — Python port of all Java physics classes.
 
-This module contains the complete physics engine for the ORT,
-ported from 15 Java source files into a single Python module.
+This module contains the complete physics engine for the
+Ontological Relativity Theory (ORT), ported from 15 Java
+source files into a single Python module.
 
 Classes:
-    SpaceTimeVelocity — Core velocity model (v²_r + v²_t = c²)
+    ORT               — Core velocity model (v²_r + v²_t = c²)
     NewtonModel       — Classical Newtonian mechanics
     EinsteinModel     — Einstein's Special Relativity
     GravityModel      — Gravity via c_local(r), Schwarzschild, RN, Kerr
@@ -126,10 +127,10 @@ R_MOON = 384_400_000
 
 
 # =============================================================================
-# SpaceTimeVelocity — Core velocity model
+# ORT — Core velocity model
 # =============================================================================
 
-class SpaceTimeVelocity:
+class ORT:
     """
     Core ORT: every object moves at c through spacetime.
     v_space² + v_time² = c²
@@ -312,7 +313,7 @@ class SpaceTimeVelocity:
         return self.total_energy(m0) / H_PLANCK
 
     def __repr__(self):
-        return (f"SpaceTimeVelocity(θ={math.degrees(self._theta):.2f}°, "
+        return (f"ORT(θ={math.degrees(self._theta):.2f}°, "
                 f"β={self.beta:.6f}, γ={self.gamma:.4f})")
 
 

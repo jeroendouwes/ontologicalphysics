@@ -1,5 +1,5 @@
 """
-SpaceTime Plots — Shared visualization functions for all notebooks.
+ORT Plots — Shared visualization functions for all notebooks.
 
 All function names are in English. Plot titles and axis labels switch
 between Dutch and English via the `lang` parameter ('nl' or 'en').
@@ -24,8 +24,8 @@ try:
 except ImportError:
     HAS_WIDGETS = False
 
-from spacetime_core import (
-    C, G, SpaceTimeVelocity, NewtonModel, EinsteinModel,
+from ort_core import (
+    C, G, ORT, NewtonModel, EinsteinModel,
     GravityModel, CosmologicalModel, R_HUBBLE, H_0,
     M_SUN, M_EARTH, R_EARTH, R_SUN, M_SGR_A_STAR, M_M87_STAR,
     D_SGR_A_STAR, D_M87_STAR, J_EARTH, J_SUN, GPB_ORBIT_RADIUS,
@@ -142,7 +142,7 @@ def velocity_circle(betas=None, lang='nl', figsize=(8, 8)):
 
     colors = plt.cm.viridis(np.linspace(0.1, 0.9, len(betas)))
     for beta, color in zip(betas, colors):
-        stv = SpaceTimeVelocity.from_beta(beta)
+        stv = ORT.from_beta(beta)
         vr = stv.beta
         vt = stv.v_time / C
 
@@ -183,7 +183,7 @@ def velocity_circle_interactive(lang='nl'):
     def _update(beta):
         plt.close('all')
         fig = velocity_circle([0.0, beta, 1.0], lang=lang, figsize=(6, 6))
-        stv = SpaceTimeVelocity.from_beta(beta)
+        stv = ORT.from_beta(beta)
         print(f"β = {beta:.3f}  |  θ = {math.degrees(stv.theta):.2f}°  |  "
               f"γ = {stv.gamma:.4f}  |  v_time/c = {stv.v_time/C:.6f}")
         plt.show()
@@ -329,7 +329,7 @@ def zijn_vector_diagram(betas=None, m0=1.0, lang='nl', figsize=(8, 8)):
     max_val = 0
 
     for beta, color in zip(betas, colors):
-        stv = SpaceTimeVelocity.from_beta(beta)
+        stv = ORT.from_beta(beta)
         s_space, s_time, s_mag = stv.zijn_vector(m0)
         # Normalize to units of m0*c
         sr = s_space / (m0 * C)
@@ -1017,10 +1017,10 @@ def zijn_qm_diagram(m0=None, lang='nl', figsize=(10, 8)):
     betas = [0.0, 0.3, 0.5, 0.8, 0.95]
     colors = plt.cm.plasma(np.linspace(0.1, 0.9, len(betas)))
 
-    lambda_C = SpaceTimeVelocity.compton_wavelength(m0)
+    lambda_C = ORT.compton_wavelength(m0)
 
     for beta, color in zip(betas, colors):
-        stv = SpaceTimeVelocity.from_beta(beta)
+        stv = ORT.from_beta(beta)
         p = stv.momentum(m0)
         s_time = m0 * C
 
@@ -1055,7 +1055,7 @@ def zijn_qm_diagram(m0=None, lang='nl', figsize=(10, 8)):
     ax.annotate(f'$\\lambda_C$ = h/$S_{{time}}$ = {lambda_C:.3e} m',
                 (0.05, 0.85), fontsize=10, color='gray')
 
-    max_sr = max(SpaceTimeVelocity.from_beta(b).momentum(m0) / (m0 * C)
+    max_sr = max(ORT.from_beta(b).momentum(m0) / (m0 * C)
                  for b in betas)
     ax.set_xlim(-0.2, max_sr * 1.3)
     ax.set_ylim(-0.2, 1.5)
@@ -1089,10 +1089,10 @@ def de_broglie_plot(m0=None, lang='nl', figsize=(10, 6)):
     betas = np.linspace(0.001, 0.999, 1000)
     wavelengths = []
     for beta in betas:
-        stv = SpaceTimeVelocity.from_beta(beta)
+        stv = ORT.from_beta(beta)
         wavelengths.append(stv.de_broglie_wavelength(m0))
 
-    lambda_C = SpaceTimeVelocity.compton_wavelength(m0)
+    lambda_C = ORT.compton_wavelength(m0)
 
     ax.semilogy(betas, wavelengths, color=_COLORS['spacetime'], linewidth=2.5,
                 label=r'$\lambda = h/p = h/S_{space}$')
@@ -1101,7 +1101,7 @@ def de_broglie_plot(m0=None, lang='nl', figsize=(10, 6)):
 
     # Mark some key points
     for beta_mark in [0.01, 0.1, 0.5, 0.9, 0.99]:
-        stv = SpaceTimeVelocity.from_beta(beta_mark)
+        stv = ORT.from_beta(beta_mark)
         lam = stv.de_broglie_wavelength(m0)
         ax.plot(beta_mark, lam, 'ko', markersize=4)
         ax.annotate(f'{lam:.2e}', (beta_mark, lam),
