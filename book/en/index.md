@@ -2,13 +2,14 @@
 
 Welcome to the interactive notebooks for the **Ontological Relativity Theory (ORT)**.
 
-ORT rests on two intuitive principles:
+ORT rests on three intuitive principles:
 
 1. **Everything moves at _c_ through spacetime** — only the direction differs.
-2. **Invariance of Being** — the product $m \times v_t = m_0 c$ is conserved.
+2. **Invariance of Being** — the product $m \cdot v_t = m_0 \cdot c$ is conserved.
+3. **Gravity as a velocity component** — near mass, the gravitational velocity $v_{grav} = \sqrt{2GM/r}$ consumes part of the velocity budget $c$. What remains is $c_{local}^2 = c^2 - v_{grav}^2$.
 
-From these two principles, all of special relativity, gravity, cosmology, and
-connections to quantum mechanics follow naturally.
+From the first two principles, the full special theory of relativity follows.
+With the third principle, the general theory of relativity is also explained.
 
 ## Notebooks
 

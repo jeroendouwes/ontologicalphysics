@@ -150,9 +150,14 @@ def velocity_circle(betas=None, lang='nl', figsize=(8, 8)):
                      arrowprops=dict(arrowstyle='->', color=color, lw=2))
         ax.plot(vr, vt, 'o', color=color, markersize=8)
 
-        label = f'$\\beta$={beta:.2f}' if beta < 1 else _t('photon', lang)
         if beta == 0:
             label = _t('at_rest', lang)
+        elif beta >= 1:
+            label = _t('photon', lang)
+        elif lang == 'nl':
+            label = f'$v_{{ruimte}}$ = {beta:.2f} c'
+        else:
+            label = f'$v_{{space}}$ = {beta:.2f} c'
         offset = (5, 5) if beta < 0.95 else (-40, 5)
         ax.annotate(label, (vr, vt), textcoords="offset points",
                     xytext=offset, fontsize=9, color=color)
@@ -368,7 +373,7 @@ def zijn_vector_diagram(betas=None, m0=1.0, lang='nl', figsize=(8, 8)):
 
 def model_comparison_bar(scenario_name, values, lang='nl', figsize=(10, 6)):
     """
-    Bar chart comparing Newton, Einstein, and SpaceTime for a given scenario.
+    Bar chart comparing Newton, Einstein, and ORT for a given scenario.
     values: dict with keys 'labels', 'newton', 'einstein', 'spacetime'
     """
     fig, ax = plt.subplots(figsize=figsize)
@@ -555,7 +560,7 @@ def light_deflection_diagram(lang='nl', figsize=(10, 6)):
     alpha_gr = 0.4  # exaggerated
     y = 1.5 + alpha_gr * np.arctan(-x*2) / np.pi
     ax.plot(x, y, color=_COLORS['spacetime'], linewidth=2.5,
-            label=r'GR / SpaceTime ($\alpha$)')
+            label=r'GR / ORT ($\alpha$)')
 
     # Impact parameter
     ax.annotate('', xy=(0, 0.3), xytext=(0, 1.5),
@@ -939,7 +944,7 @@ def comparison_table(data=None, lang='nl'):
 
     title = _t('comparison_table_title', lang)
     headers = ['Effect', 'Newton', 'Michell/Laplace', 'Soldner/Einstein 1911',
-               'ART (1915)', 'SpaceTime', 'Thomas']
+               'ART (1915)', 'ORT', 'Thomas']
 
     html = f'<h3>{title}</h3>'
     html += '<table style="border-collapse:collapse; width:100%; font-size:14px;">'

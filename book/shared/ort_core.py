@@ -1,12 +1,11 @@
 """
 ORT Core — Python port of all Java physics classes.
 
-This module contains the complete physics engine for the
-Ontological Relativity Theory (ORT), ported from 15 Java
-source files into a single Python module.
+This module contains the complete physics engine for the ORT,
+ported from 15 Java source files into a single Python module.
 
 Classes:
-    ORT               — Core velocity model (v²_r + v²_t = c²)
+    ORT — Core velocity model (v²_r + v²_t = c²)
     NewtonModel       — Classical Newtonian mechanics
     EinsteinModel     — Einstein's Special Relativity
     GravityModel      — Gravity via c_local(r), Schwarzschild, RN, Kerr
@@ -419,7 +418,11 @@ class EinsteinModel:
 
 class GravityModel:
     """
-    Gravity model based on the SpaceTime principle: c_local(r) = c·√f(r).
+    Gravity model based on the ORT principle: v_grav consumes part of c,
+    leaving c_local² = c² - v_grav² for space and time.
+
+    Derivation: v_grav = √(2GM/r) → c_local(r) = c·√(1 - r_s/r),
+    with r_s = 2GM/c² as consequence (where v_grav = c).
 
     Supports Schwarzschild (mass only), Reissner-Nordström (mass + charge),
     and Kerr (mass + spin) metrics.
