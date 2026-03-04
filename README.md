@@ -1,6 +1,6 @@
-# Ontological Relativity Theory
+# Ontological Physics
 
-Interactive Jupyter Book notebooks exploring the Ontological Relativity Theory (ORT).
+Interactive Jupyter Book exploring **Ontological Physics** — fundamental physics rebuilt from ontological principles.
 
 ## Core Idea
 
@@ -9,13 +9,18 @@ Only the direction — between space and time — differs.
 
 $$v_{space}^2 + v_{time}^2 = c^2$$
 
-## Notebooks
+## ORT Core (Ontological Relativity Theory)
 
 | # | English | Nederlands |
 |---|---------|-----------|
 | 1 | Special Relativity | Speciale Relativiteit |
 | 2 | Gravity Basics | Zwaartekracht Basis |
 | 3 | Gravity Advanced | Zwaartekracht Gevorderd |
+
+## Further Topics
+
+| # | English | Nederlands |
+|---|---------|-----------|
 | 4 | Cosmology | Kosmologie |
 | 5 | Quantum Mechanics | Kwantummechanica |
 

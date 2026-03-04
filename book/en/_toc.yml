@@ -1,8 +1,12 @@
 format: jb-book
 root: index
-chapters:
-  - file: 01_special_relativity
-  - file: 02_gravity_basics
-  - file: 03_gravity_advanced
-  - file: 04_cosmology
-  - file: 05_quantum_mechanics
+parts:
+  - caption: "Ontological Relativity Theory"
+    chapters:
+      - file: 01_special_relativity
+      - file: 02_gravity_basics
+      - file: 03_gravity_advanced
+  - caption: "Further Topics"
+    chapters:
+      - file: 04_cosmology
+      - file: 05_quantum_mechanics
