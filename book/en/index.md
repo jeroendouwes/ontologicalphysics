@@ -2,8 +2,6 @@
 
 Welcome to **Ontological Physics** — where existing theories are derived from a simpler starting point.
 
-The central idea is that everything in the universe moves at the speed of light *c* through spacetime. Only the *direction* — between space and time — differs. This single premise reproduces all results of special and general relativity.
-
 ## Ontological Relativity Theory
 
 The **Ontological Relativity Theory (ORT)** rests on three principles:
