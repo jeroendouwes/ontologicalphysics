@@ -646,6 +646,20 @@ class GravityModel:
             return 0.0
         return C * math.sqrt(1 - f)
 
+    def dc_local_dr(self, r):
+        """Gradient dc_local/dr = GM/(c·r²·√(1 - r_s/r)) — formula (23b)."""
+        f = self.metric_function(r)
+        if f <= 0:
+            return float('inf')
+        return G * self.mass / (C * r**2 * math.sqrt(f))
+
+    def proper_acceleration(self, r):
+        """Proper acceleration g = GM/(r²·√(1 - r_s/r)) [m/s²]."""
+        f = self.metric_function(r)
+        if f <= 0:
+            return float('inf')
+        return G * self.mass / (r**2 * math.sqrt(f))
+
     def spatial_stretching(self, r):
         """Spatial stretching factor 1/√f(r) — formula (38)."""
         f = self.metric_function(r)
