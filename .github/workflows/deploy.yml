@@ -29,6 +29,12 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Copy shared assets
+        run: |
+          mkdir -p book/nl/_static book/en/_static
+          cp book/shared/draft-watermark.css book/nl/_static/
+          cp book/shared/draft-watermark.css book/en/_static/
+
       - name: Build English book
         run: jupyter-book build book/en/
 

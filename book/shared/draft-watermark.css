@@ -1,0 +1,15 @@
+/* DRAFT watermark — remove from html_css_files when document is final */
+body::after {
+  content: "DRAFT";
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  font-size: 8rem;
+  font-weight: 900;
+  color: rgba(200, 0, 0, 0.08);
+  pointer-events: none;
+  z-index: 9999;
+  letter-spacing: 0.3em;
+  white-space: nowrap;
+}
