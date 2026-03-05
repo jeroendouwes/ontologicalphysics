@@ -1,4 +1,4 @@
-<a href="/en/">English version</a>
+<div style="text-align: right"><a href="/en/">English</a></div>
 
 # Ontologische Fysica
 

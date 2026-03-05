@@ -1,4 +1,4 @@
-<a href="/nl/">Nederlandse versie</a>
+<div style="text-align: right"><a href="/nl/">Nederlands</a></div>
 
 # Ontological Physics
 
