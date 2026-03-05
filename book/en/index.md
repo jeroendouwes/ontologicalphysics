@@ -1,3 +1,5 @@
+<a href="/nl/">Nederlandse versie</a>
+
 # Ontological Physics
 
 Welcome to **Ontological Physics** — where existing theories are derived from a simpler starting point.
@@ -17,6 +19,3 @@ From the first two principles, all results of special relativity follow. With th
 ```{tableofcontents}
 ```
 
----
-
-<a href="/nl/">Nederlandse versie</a>

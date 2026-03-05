@@ -1,3 +1,5 @@
+<a href="/en/">English version</a>
+
 # Ontologische Fysica
 
 Welkom bij **Ontologische Fysica** — waarin bestaande theorieën vanuit een eenvoudiger uitgangspunt worden afgeleid.
@@ -17,6 +19,3 @@ Vanuit de eerste twee principes volgen alle resultaten van de speciale relativit
 ```{tableofcontents}
 ```
 
----
-
-<a href="/en/">English version</a>
