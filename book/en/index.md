@@ -19,4 +19,4 @@ From the first two principles, all results of special relativity follow. With th
 
 ---
 
-[Nederlandse versie](../nl/index.html)
+[Nederlandse versie](/nl/index.html)
