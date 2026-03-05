@@ -179,7 +179,10 @@ def velocity_circle(betas=None, lang='nl', figsize=(8, 8)):
 def velocity_circle_interactive(lang='nl'):
     """Interactive velocity circle with slider for β."""
     if not HAS_WIDGETS:
-        print("ipywidgets not available")
+        msg = ("Interactieve versie — download het notebook om de slider te gebruiken."
+               if lang == 'nl' else
+               "Interactive version — download the notebook to use the slider.")
+        print(msg)
         return
 
     @widgets.interact(beta=widgets.FloatSlider(min=0, max=0.999, step=0.001,
@@ -452,7 +455,10 @@ def c_local_profile(models, labels=None, r_range=None, lang='nl', figsize=(10, 6
 def c_local_profile_interactive(lang='nl'):
     """Interactive c_local profile with mass slider."""
     if not HAS_WIDGETS:
-        print("ipywidgets not available")
+        msg = ("Interactieve versie — download het notebook om de slider te gebruiken."
+               if lang == 'nl' else
+               "Interactive version — download the notebook to use the slider.")
+        print(msg)
         return
 
     @widgets.interact(
@@ -734,7 +740,10 @@ def gw_strain_plot(m1=None, m2=None, distance=None, lang='nl', figsize=(12, 5)):
 def gw_inspiral_interactive(lang='nl'):
     """Interactive GW inspiral with mass sliders."""
     if not HAS_WIDGETS:
-        print("ipywidgets not available")
+        msg = ("Interactieve versie — download het notebook om de slider te gebruiken."
+               if lang == 'nl' else
+               "Interactive version — download the notebook to use the slider.")
+        print(msg)
         return
 
     @widgets.interact(
