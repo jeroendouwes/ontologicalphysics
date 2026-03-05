@@ -6,7 +6,8 @@ parts:
       - file: 01_special_relativity
       - file: 02_gravity_basics
       - file: 03_gravity_advanced
-  - caption: "Further Topics"
-    chapters:
-      - file: 04_cosmology
-      - file: 05_quantum_mechanics
+  # Further Topics — show when ready:
+  # - caption: "Further Topics"
+  #   chapters:
+  #     - file: 04_cosmology
+  #     - file: 05_quantum_mechanics

@@ -6,7 +6,8 @@ parts:
       - file: 01_speciale_relativiteit
       - file: 02_zwaartekracht_basis
       - file: 03_zwaartekracht_gevorderd
-  - caption: "Verdere Onderwerpen"
-    chapters:
-      - file: 04_kosmologie
-      - file: 05_kwantummechanica
+  # Verdere Onderwerpen — pas tonen als ze klaar zijn:
+  # - caption: "Verdere Onderwerpen"
+  #   chapters:
+  #     - file: 04_kosmologie
+  #     - file: 05_kwantummechanica
