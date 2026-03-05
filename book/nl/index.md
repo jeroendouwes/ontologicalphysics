@@ -1,6 +1,6 @@
 # Ontologische Fysica
 
-Welkom bij **Ontologische Fysica** — een nieuwe benadering van bestaande fysische modellen.
+Welkom bij **Ontologische Fysica** — waarin bestaande theorieën vanuit een eenvoudiger uitgangspunt worden afgeleid.
 
 Het centrale idee is dat alles in het universum met de lichtsnelheid *c* door de ruimtetijd beweegt. Alleen de *richting* — tussen ruimte en tijd — verschilt. Dit ene uitgangspunt reproduceert alle resultaten van de speciale en algemene relativiteitstheorie.
 
