@@ -19,4 +19,4 @@ Vanuit de eerste twee principes volgen alle resultaten van de speciale relativit
 
 ---
 
-[English version](/en/index.html)
+<a href="/en/">English version</a>
