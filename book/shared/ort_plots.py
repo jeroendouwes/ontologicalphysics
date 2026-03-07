@@ -96,6 +96,17 @@ _T = {
                           'en': 'De Broglie Wavelength vs Velocity'},
     'wavelength_label': {'nl': r'Golflengte $\lambda$ [m]', 'en': r'Wavelength $\lambda$ [m]'},
     'compton_label': {'nl': r'Comptonlengte $\lambda_C$', 'en': r'Compton wavelength $\lambda_C$'},
+    'unit_circle_title': {
+        'nl': r'Eenheidscirkel: $\cos\theta$ geeft zowel tijddilatatie als lengtecontractie',
+        'en': r'Unit circle: $\cos\theta$ gives both time dilation and length contraction'},
+    'unit_circle_td': {'nl': r'Tijddilatatie: $\tau = t \cos\theta$',
+                        'en': r'Time dilation: $\tau = t \cos\theta$'},
+    'unit_circle_lc': {'nl': r'Lengtecontractie: $L = L_0 \cos\theta$',
+                        'en': r'Length contraction: $L = L_0 \cos\theta$'},
+    'unit_circle_1s': {'nl': '1 seconde', 'en': '1 second'},
+    'unit_circle_1ls': {'nl': r'$L_0$', 'en': r'$L_0$'},
+    'unit_circle_space': {'nl': 'ruimte', 'en': 'space'},
+    'unit_circle_time': {'nl': 'tijd', 'en': 'time'},
 }
 
 
@@ -402,6 +413,112 @@ def model_comparison_bar(scenario_name, values, lang='nl', figsize=(10, 6)):
         plt.tight_layout()
     except ValueError:
         pass
+    return fig
+
+
+# =============================================================================
+# 6b. Unit-circle diagram (time dilation + length contraction)
+# =============================================================================
+
+def unit_circle_diagram(theta_deg=30, lang='nl', figsize=(14, 6)):
+    """Unit circle showing time dilation and length contraction as projections.
+
+    The same circle (radius = 1) represents both:
+    - 1 second on the time axis -> proper time tau = cos(theta)
+    - rest length L_0 perpendicular to velocity -> measured L = L_0 cos(theta)
+    """
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=figsize)
+
+    theta = np.radians(theta_deg)
+    cos_t = np.cos(theta)
+    sin_t = np.sin(theta)
+
+    def _draw_bg(ax):
+        a = np.linspace(0, 2 * np.pi, 200)
+        ax.plot(np.cos(a), np.sin(a), 'k-', lw=0.8, alpha=0.25)
+        ax.axhline(0, color='gray', lw=0.5, alpha=0.3)
+        ax.axvline(0, color='gray', lw=0.5, alpha=0.3)
+        ax.set_aspect('equal')
+
+    # --- Left panel: time dilation ---
+    _draw_bg(ax1)
+    # Velocity vector at angle theta from time axis (y-axis)
+    vx, vy = sin_t, cos_t
+    ax1.annotate('', xy=(vx, vy), xytext=(0, 0),
+                 arrowprops=dict(arrowstyle='->', color='#2070c0', lw=2.5))
+    ax1.text(vx / 2 - 0.14, vy / 2 + 0.08, r'$\vec{c}$', fontsize=16, color='#2070c0')
+
+    # 1 second mark on time axis
+    ax1.plot([-0.03, 0.03], [1, 1], 'k-', lw=2)
+    ax1.text(-0.12, 1.0, _t('unit_circle_1s', lang), fontsize=11, ha='right', va='center')
+
+    # Projection onto time axis
+    ax1.plot([vx, 0], [vy, vy], 'r--', lw=1.5, alpha=0.6)
+    ax1.plot([0, 0], [0, vy], 'r-', lw=4, alpha=0.7)
+    ax1.plot([-0.03, 0.03], [vy, vy], 'r-', lw=2)
+    ax1.text(-0.12, vy / 2, r'$\cos\theta$', fontsize=15, color='red', ha='right', va='center')
+
+    # theta arc
+    arc1 = Arc((0, 0), 0.35, 0.35, angle=90, theta1=-theta_deg, theta2=0,
+               color='purple', lw=2)
+    ax1.add_patch(arc1)
+    ax1.text(0.07, 0.22, r'$\theta$', fontsize=14, color='purple')
+
+    ax1.set_xlabel(r'$v_{%s}$ / c' % _t('unit_circle_space', lang), fontsize=13)
+    ax1.set_ylabel(r'$v_{%s}$ / c' % _t('unit_circle_time', lang), fontsize=13)
+    ax1.set_title(_t('unit_circle_td', lang), fontsize=14)
+    ax1.set_xlim(-0.3, 1.2)
+    ax1.set_ylim(-0.3, 1.2)
+
+    # --- Right panel: length contraction ---
+    _draw_bg(ax2)
+    # Velocity vector
+    ax2.annotate('', xy=(vx, vy), xytext=(0, 0),
+                 arrowprops=dict(arrowstyle='->', color='#2070c0', lw=2.5))
+    ax2.text(vx / 2 - 0.14, vy / 2 + 0.08, r'$\vec{c}$', fontsize=16, color='#2070c0')
+
+    # Rod perpendicular to velocity vector (length = 1 = L_0)
+    px = cos_t
+    py = -sin_t
+    ax2.annotate('', xy=(px, py), xytext=(0, 0),
+                 arrowprops=dict(arrowstyle='->', color='#e07020', lw=2.5))
+    ax2.text(px / 2 + 0.08, py / 2 + 0.08, _t('unit_circle_1ls', lang),
+             fontsize=15, color='#e07020')
+
+    # Right-angle mark
+    v_hat = np.array([sin_t, cos_t])
+    p_hat = np.array([cos_t, -sin_t])
+    sq = 0.05
+    ax2.plot([sq * v_hat[0], sq * (v_hat[0] + p_hat[0]), sq * p_hat[0]],
+             [sq * v_hat[1], sq * (v_hat[1] + p_hat[1]), sq * p_hat[1]], 'k-', lw=1)
+
+    # Projection of rod onto space axis (horizontal)
+    ax2.plot([px, px], [py, 0], 'g--', lw=1.5, alpha=0.5)
+    ax2.plot([0, px], [0, 0], 'g-', lw=4, alpha=0.7)
+    ax2.text(px / 2, -0.12, r'$L_0 \cos\theta$', fontsize=14, color='green', ha='center')
+
+    # theta arc
+    arc2 = Arc((0, 0), 0.35, 0.35, angle=90, theta1=-theta_deg, theta2=0,
+               color='purple', lw=2)
+    ax2.add_patch(arc2)
+    ax2.text(0.07, 0.22, r'$\theta$', fontsize=14, color='purple')
+
+    # theta arc at projection
+    arc3 = Arc((0, 0), 0.55, 0.55, angle=0,
+               theta1=np.degrees(np.arctan2(py, px)), theta2=0,
+               color='purple', lw=1.5, linestyle='--')
+    ax2.add_patch(arc3)
+    ax2.text(0.32, -0.1, r'$\theta$', fontsize=12, color='purple')
+
+    ax2.set_xlabel(r'$x$ (%s)' % _t('unit_circle_space', lang), fontsize=13)
+    ax2.set_ylabel(r'$t$ (%s)' % _t('unit_circle_time', lang), fontsize=13)
+    ax2.set_title(_t('unit_circle_lc', lang), fontsize=14)
+    ax2.set_xlim(-0.3, 1.2)
+    ax2.set_ylim(-0.55, 1.2)
+
+    fig.suptitle(_t('unit_circle_title', lang), fontsize=13, y=1.02)
+    plt.tight_layout()
+    plt.show()
     return fig
 
 
