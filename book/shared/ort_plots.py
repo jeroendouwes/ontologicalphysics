@@ -107,6 +107,50 @@ _T = {
     'unit_circle_1ls': {'nl': r'$L_0$', 'en': r'$L_0$'},
     'unit_circle_space': {'nl': 'ruimte', 'en': 'space'},
     'unit_circle_time': {'nl': 'tijd', 'en': 'time'},
+    'light_ship_title': {
+        'nl': 'Licht beweegt voor iedereen met c',
+        'en': 'Light moves at c for everyone'},
+    'light_ship_astronaut': {'nl': 'Astronaut (in het schip)',
+                              'en': 'Astronaut (in the ship)'},
+    'light_ship_platform': {'nl': 'Waarnemer (op het perron)',
+                             'en': 'Observer (on the platform)'},
+    'light_ship_simultaneous': {'nl': 'Gelijktijdig!', 'en': 'Simultaneous!'},
+    'light_ship_not_simul': {'nl': 'Niet gelijktijdig!', 'en': 'Not simultaneous!'},
+    'light_ship_back_first': {'nl': 'Achterkant\eerst', 'en': 'Back\nfirst'},
+    'light_ship_front_later': {'nl': 'Voorkant\nlater', 'en': 'Front\nlater'},
+    'duality_title': {
+        'nl': 'Gelijktijdigheid en gelijkplaatsigheid: symmetrisch rond de lichtlijn',
+        'en': 'Simultaneity and co-locality: symmetric around the light line'},
+    'duality_worldline': {'nl': 'Wereldlijn', 'en': 'Worldline'},
+    'duality_simline': {'nl': 'Gelijktijdigheidslijn', 'en': 'Simultaneity line'},
+    'duality_lightline': {'nl': 'Lichtlijn', 'en': 'Light line'},
+    'duality_colocal': {'nl': 'Gelijkplaatsigheid\n(zelfde plek, andere tijd)',
+                         'en': 'Co-locality\n(same place, different time)'},
+    'duality_simul': {'nl': 'Gelijktijdigheid\n(zelfde tijd, andere plek)',
+                       'en': 'Simultaneity\n(same time, different place)'},
+    'lorentz_decomp_title': {
+        'nl': r'Lorentz-transformatie: coördinaatmenging via $\theta$',
+        'en': r'Lorentz transformation: coordinate mixing via $\theta$'},
+    'lorentz_decomp_x': {
+        'nl': r"Ruimtecoördinaat $x$: bijdragen van $x'$ en $t'$",
+        'en': r"Space coordinate $x$: contributions from $x'$ and $t'$"},
+    'lorentz_decomp_t': {
+        'nl': r"Tijdcoördinaat $ct$: bijdragen van $x'$ en $ct'$",
+        'en': r"Time coordinate $ct$: contributions from $x'$ and $ct'$"},
+    'lorentz_decomp_space_part': {'nl': 'ruimtedeel', 'en': 'space part'},
+    'lorentz_decomp_time_part': {'nl': 'tijddeel', 'en': 'time part'},
+    'lorentz_decomp_event': {'nl': 'Gebeurtenis P', 'en': 'Event P'},
+    'obs_axes_title': {
+        'nl': r'Eenheidsvectoren van de bewegende waarnemer ($\theta = %d°$)',
+        'en': r'Unit vectors of the moving observer ($\theta = %d°$)'},
+    'obs_axes_time_dir': {'nl': 'tijdrichting', 'en': 'time direction'},
+    'obs_axes_space_dir': {'nl': 'ruimterichting', 'en': 'space direction'},
+    'obs_axes_td': {'nl': r'$\cos\theta$ = tijddilatatie', 'en': r'$\cos\theta$ = time dilation'},
+    'obs_axes_lc': {'nl': r'$\cos\theta$ = lengtecontractie', 'en': r'$\cos\theta$ = length contraction'},
+    'obs_axes_td_cross': {'nl': r'$\sin\theta$ (kruisterm)', 'en': r'$\sin\theta$ (cross-term)'},
+    'obs_axes_lc_cross': {'nl': r'$-\sin\theta$ (kruisterm)', 'en': r'$-\sin\theta$ (cross-term)'},
+    'obs_axes_space': {'nl': '$x$ (lichtseconden)', 'en': '$x$ (light-seconds)'},
+    'obs_axes_time': {'nl': '$ct$ (lichtseconden)', 'en': '$ct$ (light-seconds)'},
 }
 
 
@@ -290,6 +334,253 @@ def simultaneity_diagram(beta=0.6, lang='nl', figsize=(8, 8)):
         plt.tight_layout()
     except ValueError:
         pass
+    return fig
+
+
+# =============================================================================
+# 3a. Light-in-spaceship diagram (relativity of simultaneity)
+# =============================================================================
+
+def light_ship_diagram(beta=0.5, lang='nl', figsize=(9, 9)):
+    """Spacetime diagram of light in a moving ship.
+
+    Shows worldlines of front/back walls, light rays at 45 degrees,
+    and the simultaneity line connecting the two arrival events.
+    Demonstrates that the simultaneity axis (x') and co-locality axis (ct')
+    are symmetric around the light line.
+    Uses units where c = 1.
+    """
+    fig, ax = plt.subplots(figsize=figsize)
+
+    L = 1.0  # rest length of ship (in light-seconds)
+    alpha = math.atan(beta)  # tilt angle (both axes)
+
+    # Time range
+    t_max = L / (1 - beta) * 0.65
+
+    # --- Worldlines of ship walls ---
+    t_arr = np.linspace(-0.15, t_max, 200)
+    # Back wall: x = -L/2 + beta*t
+    ax.plot(-L / 2 + beta * t_arr, t_arr, color='#888888', lw=1.5, ls='-')
+    # Front wall: x = L/2 + beta*t
+    ax.plot(L / 2 + beta * t_arr, t_arr, color='#888888', lw=1.5, ls='-')
+    # Center (worldline = ct' axis): x = beta*t
+    wl_end = t_max * 1.05
+    ax.plot([0, beta * wl_end], [0, wl_end], color='#2070c0', lw=2.5)
+
+    # --- Light rays from origin at 45 degrees ---
+    ax.plot([0, t_max], [0, t_max], color='#f0c020', lw=2, ls='--', alpha=0.8)
+    ax.plot([0, -t_max * 0.5], [0, t_max * 0.5], color='#f0c020', lw=2, ls='--', alpha=0.8)
+
+    # --- Intersection points ---
+    # Back wall: -t = -L/2 + beta*t  =>  t_back = L / (2(1+beta))
+    t_back = L / (2 * (1 + beta))
+    x_back = -t_back  # on leftward light ray
+    # Front wall: t = L/2 + beta*t  =>  t_front = L / (2(1-beta))
+    t_front = L / (2 * (1 - beta))
+    x_front = t_front  # on rightward light ray
+
+    ax.plot(x_back, t_back, 'o', color='#c03020', ms=10, zorder=5)
+    ax.plot(x_front, t_front, 'o', color='#c03020', ms=10, zorder=5)
+
+    # --- Dashed line connecting the two events (parallel to x'-axis) ---
+    ax.plot([x_back, x_front], [t_back, t_front],
+            color='#c03020', lw=1.5, ls='--', alpha=0.5, zorder=3)
+
+    # --- Axes ---
+    ax_len = t_max * 1.1
+    ax.annotate('', xy=(ax_len, 0), xytext=(-ax_len * 0.4, 0),
+                arrowprops=dict(arrowstyle='->', color='black', lw=1.5))
+    ax.annotate('', xy=(0, ax_len), xytext=(0, -0.1),
+                arrowprops=dict(arrowstyle='->', color='black', lw=1.5))
+    ax.text(ax_len + 0.02, -0.06, r'$x$', fontsize=15)
+    ax.text(-0.08, ax_len + 0.02, r'$ct$', fontsize=15)
+
+    # --- x'-axis through origin (simultaneity axis) ---
+    xp_len = ax_len * 0.85
+    ax.plot([0, xp_len * math.cos(alpha)], [0, xp_len * math.sin(alpha)],
+            color='#c03020', lw=2, ls='-', alpha=0.5)
+
+    # --- Light line reference (extended) ---
+    ax.plot([0, ax_len * 0.9], [0, ax_len * 0.9], color='#f0c020', lw=1.5,
+            ls='--', alpha=0.5)
+
+    # --- Angle arcs ---
+    arc_r = 0.3
+    # Worldline angle alpha from ct-axis
+    a_wl = np.linspace(np.pi / 2 - alpha, np.pi / 2, 50)
+    ax.plot(arc_r * np.cos(a_wl), arc_r * np.sin(a_wl), color='#2070c0', lw=2)
+    mid_wl = np.pi / 2 - alpha / 2
+    ax.text(arc_r * 1.35 * math.cos(mid_wl), arc_r * 1.35 * math.sin(mid_wl),
+            r'$\alpha$', fontsize=15, color='#2070c0', ha='center', va='center')
+
+    # Simultaneity line angle alpha from x-axis (arc connects to x'-axis at origin)
+    a_sl = np.linspace(0, alpha, 50)
+    ax.plot(arc_r * np.cos(a_sl), arc_r * np.sin(a_sl), color='#c03020', lw=2)
+    mid_sl = alpha / 2
+    ax.text(arc_r * 1.35 * math.cos(mid_sl), arc_r * 1.35 * math.sin(mid_sl),
+            r'$\alpha$', fontsize=15, color='#c03020', ha='center', va='center')
+
+    # --- Labels ---
+    # Worldline label (at 60% along the line, inside diagram)
+    wl_lbl_t = wl_end * 0.55
+    ax.text(beta * wl_lbl_t + 0.06, wl_lbl_t,
+            _t('duality_worldline', lang) + r" ($ct'$)",
+            fontsize=11, color='#2070c0', rotation=math.degrees(math.atan2(1, beta)),
+            va='bottom')
+
+    # Simultaneity line label (on x'-axis, at 60%)
+    xp_lbl = xp_len * 0.55
+    ax.text(xp_lbl * math.cos(alpha), xp_lbl * math.sin(alpha) - 0.06,
+            _t('duality_simline', lang) + r" ($x'$)",
+            fontsize=11, color='#c03020', ha='center', va='top',
+            rotation=math.degrees(alpha))
+
+    # Light line label (at 45% along)
+    ax.text(ax_len * 0.42, ax_len * 0.47, _t('duality_lightline', lang),
+            fontsize=10, color='#c09800', rotation=45, ha='center',
+            bbox=dict(boxstyle='round,pad=0.2', fc='#fffde0', ec='none', alpha=0.8))
+
+    # Event labels
+    if lang == 'nl':
+        ax.text(x_back - 0.04, t_back + 0.03, 'Achterkant',
+                fontsize=9, ha='right', color='#c03020')
+        ax.text(x_front + 0.04, t_front + 0.03, 'Voorkant',
+                fontsize=9, ha='left', color='#c03020')
+    else:
+        ax.text(x_back - 0.04, t_back + 0.03, 'Back',
+                fontsize=9, ha='right', color='#c03020')
+        ax.text(x_front + 0.04, t_front + 0.03, 'Front',
+                fontsize=9, ha='left', color='#c03020')
+
+    # Lamp event
+    ax.plot(0, 0, 'o', color='#f0c020', ms=10, zorder=5)
+    if lang == 'nl':
+        ax.text(0.06, -0.04, 'Lamp aan', fontsize=9, color='#c09800', va='top')
+    else:
+        ax.text(0.06, -0.04, 'Lamp on', fontsize=9, color='#c09800', va='top')
+
+    ax.set_xlim(-ax_len * 0.45, ax_len * 1.15)
+    ax.set_ylim(-0.15, ax_len * 1.15)
+    ax.set_aspect('equal')
+    ax.set_title(_t('light_ship_title', lang) +
+                 r'  ($v/c$ = %.1f,  $\alpha$ = %.1f°)' % (beta, math.degrees(alpha)),
+                 fontsize=13)
+    ax.grid(True, alpha=0.15)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    try:
+        plt.tight_layout()
+    except ValueError:
+        pass
+    plt.show()
+    return fig
+
+
+# =============================================================================
+# 3b. Simultaneity–Co-locality Duality Diagram
+# =============================================================================
+
+def duality_diagram(beta=0.5, lang='nl', figsize=(8, 8)):
+    """Show that simultaneity and co-locality are symmetric around the light line.
+
+    The worldline (co-locality) tilts from the ct-axis toward the light line.
+    The simultaneity line tilts from the x-axis toward the light line by the
+    same angle. Both make angle arctan(beta) with their respective axis.
+    """
+    fig, ax = plt.subplots(figsize=figsize)
+    L = 1.6  # axis length
+
+    # Axes
+    ax.annotate('', xy=(L, 0), xytext=(-0.1, 0),
+                arrowprops=dict(arrowstyle='->', color='black', lw=1.5))
+    ax.annotate('', xy=(0, L), xytext=(0, -0.1),
+                arrowprops=dict(arrowstyle='->', color='black', lw=1.5))
+    ax.text(L + 0.05, -0.08, r'$x$', fontsize=15)
+    ax.text(-0.12, L + 0.03, r'$ct$', fontsize=15)
+
+    # Light line (45 degrees)
+    ax.plot([0, L], [0, L], color='#f0c020', lw=2.5, ls='--', alpha=0.8)
+    ax.text(L * 0.72, L * 0.78, _t('duality_lightline', lang),
+            fontsize=12, color='#c09800', rotation=45, ha='center',
+            bbox=dict(boxstyle='round,pad=0.2', fc='#fffde0', ec='none', alpha=0.8))
+
+    # Angle from beta
+    alpha = math.atan(beta)  # angle worldline makes with ct-axis
+    # Same angle: simultaneity line makes with x-axis
+
+    # --- Worldline (co-locality): tilts from ct-axis ---
+    wl_x = L * math.sin(alpha)
+    wl_y = L * math.cos(alpha)
+    ax.plot([0, wl_x], [0, wl_y], color='#2070c0', lw=2.5)
+    ax.text(wl_x + 0.05, wl_y - 0.05,
+            _t('duality_worldline', lang) + r" ($ct'$)",
+            fontsize=12, color='#2070c0')
+
+    # --- Simultaneity line: tilts from x-axis ---
+    sl_x = L * math.cos(alpha)
+    sl_y = L * math.sin(alpha)
+    ax.plot([0, sl_x], [0, sl_y], color='#c03020', lw=2.5)
+    ax.text(sl_x + 0.05, sl_y - 0.05,
+            _t('duality_simline', lang) + r" ($x'$)",
+            fontsize=12, color='#c03020')
+
+    # --- Rest frame references (faded) ---
+    ax.plot([0, 0], [0, L], color='#2070c0', lw=1, ls=':', alpha=0.4)
+    ax.plot([0, L], [0, 0], color='#c03020', lw=1, ls=':', alpha=0.4)
+
+    # --- Angle arcs ---
+    # Worldline angle from ct-axis
+    arc_r = 0.35
+    a_wl = np.linspace(np.pi / 2 - alpha, np.pi / 2, 50)
+    ax.plot(arc_r * np.cos(a_wl), arc_r * np.sin(a_wl), color='#2070c0', lw=1.5)
+    mid_wl = np.pi / 2 - alpha / 2
+    ax.text(arc_r * 1.25 * math.cos(mid_wl), arc_r * 1.25 * math.sin(mid_wl),
+            r'$\alpha$', fontsize=14, color='#2070c0', ha='center', va='center')
+
+    # Simultaneity line angle from x-axis
+    a_sl = np.linspace(0, alpha, 50)
+    ax.plot(arc_r * np.cos(a_sl), arc_r * np.sin(a_sl), color='#c03020', lw=1.5)
+    mid_sl = alpha / 2
+    ax.text(arc_r * 1.25 * math.cos(mid_sl), arc_r * 1.25 * math.sin(mid_sl),
+            r'$\alpha$', fontsize=14, color='#c03020', ha='center', va='center')
+
+    # --- Symmetry annotation ---
+    # Double-headed arrow between the two lines near the light line
+    mid_r = L * 0.45
+    ax.annotate('',
+                xy=(mid_r * math.cos(alpha), mid_r * math.sin(alpha)),
+                xytext=(mid_r * math.sin(alpha), mid_r * math.cos(alpha)),
+                arrowprops=dict(arrowstyle='<->', color='purple', lw=1.5,
+                                connectionstyle='arc3,rad=0.3'))
+    ax.text(mid_r * 0.62, mid_r * 0.62 + 0.12, r'$\alpha = \alpha$',
+            fontsize=12, color='purple', ha='center',
+            bbox=dict(boxstyle='round,pad=0.2', fc='#f0e8ff', ec='none', alpha=0.8))
+
+    # Labels for the concepts
+    ax.text(-0.15, L * 0.6, _t('duality_colocal', lang),
+            fontsize=10, color='#2070c0', ha='right', va='center',
+            bbox=dict(boxstyle='round,pad=0.3', fc='#e8f0ff', ec='#2070c0', alpha=0.6))
+    ax.text(L * 0.6, -0.18, _t('duality_simul', lang),
+            fontsize=10, color='#c03020', ha='center', va='top',
+            bbox=dict(boxstyle='round,pad=0.3', fc='#ffe8e8', ec='#c03020', alpha=0.6))
+
+    ax.set_xlim(-0.4, L + 0.4)
+    ax.set_ylim(-0.4, L + 0.4)
+    ax.set_aspect('equal')
+    ax.set_title(_t('duality_title', lang) +
+                 r'  ($v/c$ = %.1f,  $\alpha$ = arctan($v/c$) = %.1f°)' % (
+                     beta, math.degrees(alpha)),
+                 fontsize=12)
+    ax.grid(True, alpha=0.15)
+    # Remove ticks for clean look
+    ax.set_xticks([])
+    ax.set_yticks([])
+    try:
+        plt.tight_layout()
+    except ValueError:
+        pass
+    plt.show()
     return fig
 
 
@@ -517,6 +808,231 @@ def unit_circle_diagram(theta_deg=30, lang='nl', figsize=(14, 6)):
     ax2.set_ylim(-0.55, 1.2)
 
     fig.suptitle(_t('unit_circle_title', lang), fontsize=13, y=1.02)
+    plt.tight_layout()
+    plt.show()
+    return fig
+
+
+# =============================================================================
+# 6b2. Observer axes diagram — unit vectors rotated by θ
+# =============================================================================
+
+def observer_axes_diagram(theta_deg=30, lang='nl', figsize=(8, 8)):
+    """Show the moving observer's unit vectors (time and space directions)
+    as two perpendicular arrows rotated by θ inside a unit circle.
+
+    Projections onto the rest-frame axes both give cos(θ), making
+    time dilation and length contraction visible at a glance.
+    """
+    fig, ax = plt.subplots(1, 1, figsize=figsize)
+
+    theta = np.radians(theta_deg)
+    cos_t = np.cos(theta)
+    sin_t = np.sin(theta)
+
+    # Unit circle
+    a = np.linspace(0, 2 * np.pi, 200)
+    ax.plot(np.cos(a), np.sin(a), 'k-', lw=0.8, alpha=0.25)
+
+    # Rest-frame axes
+    ax.axhline(0, color='gray', lw=0.5, alpha=0.3)
+    ax.axvline(0, color='gray', lw=0.5, alpha=0.3)
+
+    # Tick marks at 1 on the axes
+    ax.plot([-0.02, 0.02], [1, 1], 'k-', lw=1.5)
+    ax.plot([1, 1], [-0.02, 0.02], 'k-', lw=1.5)
+
+    # --- Time direction of moving observer (blue) ---
+    tx, ty = sin_t, cos_t  # on the unit circle, rotated by θ from time axis
+    ax.annotate('', xy=(tx, ty), xytext=(0, 0),
+                arrowprops=dict(arrowstyle='->', color='#2070c0', lw=2.5))
+    ax.text(tx + 0.06, ty + 0.04,
+            _t('obs_axes_time_dir', lang), fontsize=12, color='#2070c0',
+            style='italic')
+
+    # Projection onto time axis (vertical) — cos θ = time dilation
+    ax.plot([tx, 0], [ty, ty], '#2070c0', ls='--', lw=1.5, alpha=0.5)
+    ax.plot([0, 0], [0, ty], '#2070c0', lw=4, alpha=0.5)
+    ax.plot([-0.03, 0.03], [ty, ty], '#2070c0', lw=2)
+    ax.text(-0.08, ty, r'$\cos\theta$', fontsize=14, color='#2070c0',
+            ha='right', va='center', fontweight='bold')
+
+    # Projection onto space axis (horizontal) — +sin θ = velocity (v/c)
+    ax.plot([tx, tx], [ty, 0], '#2070c0', ls='--', lw=1.5, alpha=0.3)
+    ax.plot([0, tx], [0, 0], '#2070c0', lw=4, alpha=0.3)
+    ax.plot([tx, tx], [-0.03, 0.03], '#2070c0', lw=2, alpha=0.6)
+    ax.text(tx, -0.08, r'$\sin\theta$', fontsize=12, color='#2070c0',
+            ha='center', va='top', fontweight='bold', alpha=0.8)
+
+    # --- Space direction of moving observer (red/orange) ---
+    sx, sy = cos_t, -sin_t  # perpendicular, on the unit circle
+    ax.annotate('', xy=(sx, sy), xytext=(0, 0),
+                arrowprops=dict(arrowstyle='->', color='#c04020', lw=2.5))
+    ax.text(sx + 0.04, sy - 0.08,
+            _t('obs_axes_space_dir', lang), fontsize=12, color='#c04020',
+            style='italic')
+
+    # Projection onto space axis (horizontal) — cos θ = length contraction
+    ax.plot([sx, sx], [sy, 0], '#c04020', ls='--', lw=1.5, alpha=0.5)
+    ax.plot([0, sx], [0, 0], '#c04020', lw=4, alpha=0.5)
+    ax.plot([sx, sx], [-0.03, 0.03], '#c04020', lw=2)
+    ax.text(sx, -0.08, r'$\cos\theta$', fontsize=14, color='#c04020',
+            ha='center', va='top', fontweight='bold')
+
+    # Projection onto time axis (vertical) — -sin θ = simultaneity shift
+    ax.plot([sx, 0], [sy, sy], '#c04020', ls='--', lw=1.5, alpha=0.3)
+    ax.plot([0, 0], [0, sy], '#c04020', lw=4, alpha=0.3)
+    ax.plot([-0.03, 0.03], [sy, sy], '#c04020', lw=2, alpha=0.6)
+    ax.text(-0.08, sy, r'$-\sin\theta$', fontsize=12, color='#c04020',
+            ha='right', va='center', fontweight='bold', alpha=0.8)
+
+    # Right-angle mark between the two arrows
+    sq = 0.06
+    t_hat = np.array([tx, ty])
+    s_hat = np.array([sx, sy])
+    ax.plot([sq * t_hat[0], sq * (t_hat[0] + s_hat[0]), sq * s_hat[0]],
+            [sq * t_hat[1], sq * (t_hat[1] + s_hat[1]), sq * s_hat[1]],
+            'k-', lw=1)
+
+    # θ arc from vertical axis to time direction
+    arc = Arc((0, 0), 0.4, 0.4, angle=90, theta1=-theta_deg, theta2=0,
+              color='purple', lw=2)
+    ax.add_patch(arc)
+    ax.text(0.08, 0.25, r'$\theta$', fontsize=15, color='purple')
+
+    # Annotation labels for the diagonal projections
+    ax.text(-0.14, ty / 2, _t('obs_axes_td', lang),
+            fontsize=10, color='#2070c0', ha='right', va='center',
+            rotation=90)
+    ax.text(sx / 2, -0.12, _t('obs_axes_lc', lang),
+            fontsize=10, color='#c04020', ha='center', va='top')
+
+    # Annotation labels for the cross-term projections
+    ax.text(tx / 2, -0.12, _t('obs_axes_td_cross', lang),
+            fontsize=9, color='#2070c0', ha='center', va='top', alpha=0.8)
+    ax.text(-0.14, sy / 2, _t('obs_axes_lc_cross', lang),
+            fontsize=9, color='#c04020', ha='right', va='center',
+            rotation=90, alpha=0.8)
+
+    # Axis labels
+    ax.set_xlabel(_t('obs_axes_space', lang), fontsize=14)
+    ax.set_ylabel(_t('obs_axes_time', lang), fontsize=14)
+    ax.set_title(_t('obs_axes_title', lang) % theta_deg, fontsize=14)
+
+    ax.set_aspect('equal')
+    ax.set_xlim(-0.3, 1.3)
+    ax.set_ylim(-0.7, 1.3)
+
+    plt.tight_layout()
+    plt.show()
+    return fig
+
+
+# =============================================================================
+# 6c. Lorentz decomposition diagram (coordinate mixing)
+# =============================================================================
+
+def lorentz_decomposition_diagram(theta_deg=30, lang='nl', figsize=(14, 6)):
+    """Show how x and ct each mix space and time parts via cos(theta), sin(theta).
+
+    Inverse Lorentz transformation in ORT notation:
+        x  = (1/cos theta) x' + c tan theta . t'
+        ct = (tan theta) x'   + (1/cos theta) ct'
+
+    Left panel:  x  decomposed into x'-part (blue) and t'-part (red)
+    Right panel: ct decomposed into x'-part (blue) and ct'-part (red)
+    """
+    theta = np.radians(theta_deg)
+    cos_t = np.cos(theta)
+    sin_t = np.sin(theta)
+    tan_t = np.tan(theta)
+
+    # Pick an event P in the primed frame
+    xp = 0.6   # x' value
+    ctp = 0.8  # ct' value
+
+    # Inverse Lorentz: compute rest-frame coordinates
+    x_total = xp / cos_t + ctp * tan_t
+    ct_total = xp * tan_t + ctp / cos_t
+
+    # Decompose
+    x_from_xp = xp / cos_t       # space part of x
+    x_from_tp = ctp * tan_t      # time part of x
+    ct_from_xp = xp * tan_t      # space part of ct
+    ct_from_tp = ctp / cos_t     # time part of ct
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=figsize)
+
+    space_color = '#2070c0'  # blue for space (x') contributions
+    time_color = '#c03020'   # red for time (t') contributions
+    bar_h = 0.25
+
+    # --- Left panel: x coordinate ---
+    ax1.barh(0, x_from_xp, height=bar_h, color=space_color, alpha=0.8,
+             label=r"$\frac{1}{\cos\theta}\,x'$ = %.3f  (%s)" % (
+                 x_from_xp, _t('lorentz_decomp_space_part', lang)))
+    ax1.barh(0, x_from_tp, height=bar_h, left=x_from_xp, color=time_color, alpha=0.8,
+             label=r"$\tan\theta \cdot ct'$ = %.3f  (%s)" % (
+                 x_from_tp, _t('lorentz_decomp_time_part', lang)))
+
+    # Annotation on the bars
+    if x_from_xp > 0.15:
+        ax1.text(x_from_xp / 2, 0, r'$\frac{x\prime}{\cos\theta}$',
+                 ha='center', va='center', fontsize=14, color='white', fontweight='bold')
+    if x_from_tp > 0.15:
+        ax1.text(x_from_xp + x_from_tp / 2, 0, r'$\tan\theta \cdot ct\prime$',
+                 ha='center', va='center', fontsize=14, color='white', fontweight='bold')
+
+    # Total marker
+    ax1.axvline(x_total, color='black', lw=2, ls='--', alpha=0.6)
+    ax1.text(x_total + 0.02, bar_h * 0.8,
+             r'$x = %.3f$' % x_total, fontsize=12, va='bottom')
+
+    ax1.set_xlim(0, x_total * 1.25)
+    ax1.set_yticks([])
+    ax1.set_xlabel(r'$x$', fontsize=14)
+    ax1.set_title(_t('lorentz_decomp_x', lang), fontsize=13)
+    ax1.legend(fontsize=11, loc='upper left')
+    ax1.grid(True, alpha=0.2, axis='x')
+
+    # Formula below
+    ax1.text(0.5, -0.15, r'$x = \frac{1}{\cos\theta}\,x\prime + \tan\theta \cdot ct\prime$',
+             transform=ax1.transAxes, ha='center', fontsize=15, style='italic')
+
+    # --- Right panel: ct coordinate ---
+    ax2.barh(0, ct_from_xp, height=bar_h, color=space_color, alpha=0.8,
+             label=r"$\tan\theta \cdot x'$ = %.3f  (%s)" % (
+                 ct_from_xp, _t('lorentz_decomp_space_part', lang)))
+    ax2.barh(0, ct_from_tp, height=bar_h, left=ct_from_xp, color=time_color, alpha=0.8,
+             label=r"$\frac{1}{\cos\theta}\,ct'$ = %.3f  (%s)" % (
+                 ct_from_tp, _t('lorentz_decomp_time_part', lang)))
+
+    if ct_from_xp > 0.15:
+        ax2.text(ct_from_xp / 2, 0, r'$\tan\theta \cdot x\prime$',
+                 ha='center', va='center', fontsize=14, color='white', fontweight='bold')
+    if ct_from_tp > 0.15:
+        ax2.text(ct_from_xp + ct_from_tp / 2, 0, r'$\frac{ct\prime}{\cos\theta}$',
+                 ha='center', va='center', fontsize=14, color='white', fontweight='bold')
+
+    ax2.axvline(ct_total, color='black', lw=2, ls='--', alpha=0.6)
+    ax2.text(ct_total + 0.02, bar_h * 0.8,
+             r'$ct = %.3f$' % ct_total, fontsize=12, va='bottom')
+
+    ax2.set_xlim(0, ct_total * 1.25)
+    ax2.set_yticks([])
+    ax2.set_xlabel(r'$ct$', fontsize=14)
+    ax2.set_title(_t('lorentz_decomp_t', lang), fontsize=13)
+    ax2.legend(fontsize=11, loc='upper left')
+    ax2.grid(True, alpha=0.2, axis='x')
+
+    ax2.text(0.5, -0.15, r'$ct = \tan\theta \cdot x\prime + \frac{1}{\cos\theta}\,ct\prime$',
+             transform=ax2.transAxes, ha='center', fontsize=15, style='italic')
+
+    # Suptitle with event info
+    fig.suptitle(
+        _t('lorentz_decomp_title', lang) +
+        r"  ($\theta$ = %g°,  $x'$ = %.1f,  $ct'$ = %.1f)" % (theta_deg, xp, ctp),
+        fontsize=13, y=1.02)
     plt.tight_layout()
     plt.show()
     return fig
