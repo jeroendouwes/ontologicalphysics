@@ -1052,16 +1052,16 @@ def observer_axes_diagram(theta_deg=30, lang='nl', figsize=(8, 8)):
     ax.text(0.08, 0.25, r'$\theta$', fontsize=15, color='purple')
 
     # Annotation labels for the diagonal projections
-    ax.text(-0.14, ty / 2, _t('obs_axes_td', lang),
+    ax.text(-0.18, ty / 2, _t('obs_axes_td', lang),
             fontsize=10, color='#2070c0', ha='right', va='center',
             rotation=90)
-    ax.text(sx / 2, -0.12, _t('obs_axes_lc', lang),
+    ax.text(sx / 2, -0.18, _t('obs_axes_lc', lang),
             fontsize=10, color='#c04020', ha='center', va='top')
 
     # Annotation labels for the cross-term projections
-    ax.text(tx / 2, -0.12, _t('obs_axes_td_cross', lang),
+    ax.text(tx / 2, -0.18, _t('obs_axes_td_cross', lang),
             fontsize=9, color='#2070c0', ha='center', va='top', alpha=0.8)
-    ax.text(-0.14, sy / 2, _t('obs_axes_lc_cross', lang),
+    ax.text(-0.18, sy / 2, _t('obs_axes_lc_cross', lang),
             fontsize=9, color='#c04020', ha='right', va='center',
             rotation=90, alpha=0.8)
 
