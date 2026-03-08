@@ -826,21 +826,29 @@ def unit_circle_diagram(theta_deg=30, lang='nl', figsize=(14, 6)):
 # =============================================================================
 
 def lc_symmetry_diagram(theta_deg=30, lang='nl', figsize=(7, 7)):
-    """Show that length contraction = time dilation, because light travels
-    at 45° in a spacetime diagram (ct vs x), making the axes symmetric.
+    """Minkowski spacetime diagram showing that length contraction = time
+    dilation by the 45° light-line symmetry.
 
-    The moving observer's time vector (sin θ, cos θ) projects cos θ onto ct.
-    The 45° light line mirrors this: the space vector (cos θ, -sin θ) projects
-    cos θ onto x.  Same factor, same geometry.
+    Both primed axes (ct' and x') tilt by the same angle α toward the 45°
+    light line.  This symmetric tilt means: whatever factor applies to time
+    (cos θ = time dilation) must equally apply to space (cos θ = length
+    contraction).
     """
     fig, ax = plt.subplots(1, 1, figsize=figsize)
 
     theta = np.radians(theta_deg)
-    cos_t = np.cos(theta)
-    sin_t = np.sin(theta)
+    beta = np.sin(theta)  # v/c
+    gamma = 1.0 / np.cos(theta)
 
-    # --- Axes ---
-    ax_len = 1.25
+    # Minkowski diagram directions (unnormalized):
+    #   ct' axis: direction (beta, 1)  — tilts from ct toward light line
+    #   x'  axis: direction (1, beta)  — tilts from x  toward light line
+    # Both tilt by angle alpha = arctan(beta) toward the 45° diagonal.
+    alpha_deg = np.degrees(np.arctan(beta))
+
+    ax_len = 1.4
+
+    # --- Rest-frame axes (gray) ---
     ax.annotate('', xy=(ax_len, 0), xytext=(0, 0),
                 arrowprops=dict(arrowstyle='->', color='gray', lw=1.5))
     ax.annotate('', xy=(0, ax_len), xytext=(0, 0),
@@ -849,74 +857,106 @@ def lc_symmetry_diagram(theta_deg=30, lang='nl', figsize=(7, 7)):
     ax.text(-0.08, ax_len + 0.02, '$ct$', fontsize=14, color='gray')
 
     # --- 45° light line ---
-    ax.plot([0, 1.15], [0, 1.15], color='#e6a817', lw=2, ls='--', alpha=0.7)
-    ax.text(0.95, 1.05, _t('lc_sym_light', lang),
+    ax.plot([0, 1.3], [0, 1.3], color='#e6a817', lw=2, ls='--', alpha=0.7)
+    ax.text(1.08, 1.18, _t('lc_sym_light', lang),
             fontsize=11, color='#c49000', rotation=45, ha='center',
             style='italic')
 
-    # --- Mirror line label (optional subtle) ---
-    # The 45° line IS the mirror axis
-
-    # --- Time direction (blue) ---
-    tx, ty = sin_t, cos_t
-    ax.annotate('', xy=(tx, ty), xytext=(0, 0),
+    # --- Moving ct' axis (blue) ---
+    ct_end = np.array([beta, 1.0]) * 1.2
+    ax.annotate('', xy=ct_end, xytext=(0, 0),
                 arrowprops=dict(arrowstyle='->', color='#2070c0', lw=2.5))
-    ax.text(tx + 0.05, ty + 0.04,
-            _t('lc_sym_time_dir', lang), fontsize=11, color='#2070c0',
-            style='italic')
+    ax.text(ct_end[0] + 0.05, ct_end[1] + 0.02, "$ct'$",
+            fontsize=13, color='#2070c0', style='italic')
 
-    # Projection onto ct-axis: cos θ (time dilation)
-    ax.plot([tx, 0], [ty, ty], '#2070c0', ls=':', lw=1.5, alpha=0.5)
-    ax.plot([0, 0], [0, ty], '#2070c0', lw=5, alpha=0.4)
-    ax.plot([-0.02, 0.02], [ty, ty], '#2070c0', lw=2)
-    ax.text(-0.06, ty, r'$\cos\theta$', fontsize=13, color='#2070c0',
-            ha='right', va='center', fontweight='bold')
-    ax.text(-0.06, ty / 2, _t('lc_sym_td', lang),
-            fontsize=9, color='#2070c0', ha='right', va='center',
-            rotation=90)
-
-    # --- Space direction (red) ---
-    sx, sy = cos_t, -sin_t
-    ax.annotate('', xy=(sx, sy), xytext=(0, 0),
+    # --- Moving x' axis (red) ---
+    x_end = np.array([1.0, beta]) * 1.2
+    ax.annotate('', xy=x_end, xytext=(0, 0),
                 arrowprops=dict(arrowstyle='->', color='#c04020', lw=2.5))
-    ax.text(sx + 0.04, sy - 0.07,
-            _t('lc_sym_space_dir', lang), fontsize=11, color='#c04020',
-            style='italic')
+    ax.text(x_end[0] + 0.03, x_end[1] - 0.07, "$x'$",
+            fontsize=13, color='#c04020', style='italic')
 
-    # Projection onto x-axis: cos θ (length contraction)
-    ax.plot([sx, sx], [sy, 0], '#c04020', ls=':', lw=1.5, alpha=0.5)
-    ax.plot([0, sx], [0, 0], '#c04020', lw=5, alpha=0.4)
-    ax.plot([sx, sx], [-0.02, 0.02], '#c04020', lw=2)
-    ax.text(sx, 0.06, r'$\cos\theta$', fontsize=13, color='#c04020',
-            ha='center', va='bottom', fontweight='bold')
-    ax.text(sx / 2, 0.06, _t('lc_sym_lc', lang),
-            fontsize=9, color='#c04020', ha='center', va='bottom')
+    # --- Time dilation parallelogram (blue) ---
+    # 1 second on ct axis → draw line of simultaneity (parallel to x')
+    # to find where it meets ct' axis.
+    # Point on ct at height 1: (0, 1)
+    # Line of simultaneity through (0,1) parallel to x'-direction (1, beta):
+    #   parametric: (t, 1 + t*beta)
+    # Intersect with ct' axis direction (beta, 1):
+    #   (t, 1 + t*beta) = s*(beta, 1)  →  t = s*beta, 1+t*beta = s
+    #   → s = 1 + s*beta^2  → s = 1/(1-beta^2) = gamma^2
+    #   → intersection at s*gamma^2*(beta, 1)  ... that's far away.
+    # Actually: let me just show the "1 proper second" on ct'.
+    # In Minkowski geometry, 1 proper second along ct' is at
+    # (x, ct) = (beta*gamma, gamma).  Its ct-coordinate is gamma = 1/cos θ.
+    # The REST-FRAME observer reads ct = gamma for that event → time DILATION.
+    # Conversely, ct = 1 in rest frame corresponds to tau = cos θ proper time.
 
-    # --- Mirror symmetry visual: dashed arcs showing the reflection ---
-    # Small right-angle mark between vectors
-    sq = 0.06
-    t_hat = np.array([tx, ty])
-    s_hat = np.array([sx, sy])
-    ax.plot([sq * t_hat[0], sq * (t_hat[0] + s_hat[0]), sq * s_hat[0]],
-            [sq * t_hat[1], sq * (t_hat[1] + s_hat[1]), sq * s_hat[1]],
-            'k-', lw=1)
+    # Show: 1 unit on ct, and the corresponding proper time = cos θ.
+    # Mark ct = 1
+    ax.plot([-0.02, 0.02], [1, 1], 'k-', lw=1.5)
+    ax.text(-0.05, 1.0, '$1$', fontsize=11, color='gray', ha='right', va='center')
 
-    # θ arc from ct-axis to time direction
-    arc = Arc((0, 0), 0.35, 0.35, angle=90, theta1=-theta_deg, theta2=0,
+    # Line of simultaneity in S' through ct=1 on ct-axis: parallel to x' dir
+    # From (0, 1), direction (1, beta): parametric (t, 1+t*beta)
+    # This meets ct' at: (t, 1+t*beta) = s*(beta, 1) → t = s*beta, 1+t*beta = s
+    # → 1 + s*beta^2 = s → s = 1/(1-beta^2) = gamma^2
+    # But we only need the visual line segment. Draw from (0,1) a short way.
+    sim_len = 0.4
+    sim_end = np.array([sim_len, 1 + sim_len * beta])
+    ax.plot([0, sim_end[0]], [1, sim_end[1]], '#2070c0', ls=':', lw=1.5, alpha=0.6)
+
+    # The proper time for this rest-frame second is cos θ.
+    # Annotate on the left.
+    ax.text(-0.06, 0.5, _t('lc_sym_td', lang),
+            fontsize=9, color='#2070c0', ha='right', va='center', rotation=90)
+
+    # --- Length contraction parallelogram (red) ---
+    # 1 light-second on x axis → draw world line (parallel to ct')
+    # to find where it meets x' axis.
+    ax.plot([1, 1], [-0.02, 0.02], 'k-', lw=1.5)
+    ax.text(1.0, -0.05, '$1$', fontsize=11, color='gray', ha='center', va='top')
+
+    # World line through (1, 0) parallel to ct' direction (beta, 1):
+    wl_len = 0.4
+    wl_end = np.array([1 + wl_len * beta, wl_len])
+    ax.plot([1, wl_end[0]], [0, wl_end[1]], '#c04020', ls=':', lw=1.5, alpha=0.6)
+
+    ax.text(0.5, -0.06, _t('lc_sym_lc', lang),
+            fontsize=9, color='#c04020', ha='center', va='top')
+
+    # --- Angle α labels showing symmetric tilt ---
+    # α from ct-axis to ct'
+    arc = Arc((0, 0), 0.5, 0.5, angle=90, theta1=-alpha_deg, theta2=0,
               color='purple', lw=1.5)
     ax.add_patch(arc)
-    ax.text(0.07, 0.22, r'$\theta$', fontsize=13, color='purple')
+    ax.text(0.09, 0.32, r'$\alpha$', fontsize=13, color='purple')
 
-    # θ arc from x-axis to space direction (mirror)
-    arc2 = Arc((0, 0), 0.35, 0.35, angle=0, theta1=-theta_deg, theta2=0,
+    # α from x-axis to x'
+    arc2 = Arc((0, 0), 0.5, 0.5, angle=0, theta1=0, theta2=alpha_deg,
                color='purple', lw=1.5)
     ax.add_patch(arc2)
-    ax.text(0.22, -0.07, r'$\theta$', fontsize=13, color='purple')
+    ax.text(0.34, 0.08, r'$\alpha$', fontsize=13, color='purple')
+
+    # --- cos θ annotations ---
+    # For time: proper time of 1 rest-frame second = cos θ
+    cos_t = np.cos(theta)
+    # Small bracket or annotation near ct axis
+    ax.annotate(r'$\cos\theta$',
+                xy=(0, cos_t), xytext=(-0.15, cos_t),
+                fontsize=12, color='#2070c0', fontweight='bold',
+                ha='right', va='center')
+
+    # For space: proper length of 1 rest-frame light-second = cos θ
+    ax.annotate(r'$\cos\theta$',
+                xy=(cos_t, 0), xytext=(cos_t, -0.12),
+                fontsize=12, color='#c04020', fontweight='bold',
+                ha='center', va='top')
 
     ax.set_title(_t('lc_sym_title', lang) % theta_deg, fontsize=14)
     ax.set_aspect('equal')
-    ax.set_xlim(-0.25, 1.3)
-    ax.set_ylim(-0.55, 1.3)
+    ax.set_xlim(-0.3, 1.5)
+    ax.set_ylim(-0.2, 1.5)
     ax.axis('off')
 
     plt.tight_layout()
