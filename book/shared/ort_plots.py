@@ -151,6 +151,14 @@ _T = {
     'obs_axes_lc_cross': {'nl': r'$-\sin\theta$ (kruisterm)', 'en': r'$-\sin\theta$ (cross-term)'},
     'obs_axes_space': {'nl': '$x$ (lichtseconden)', 'en': '$x$ (light-seconds)'},
     'obs_axes_time': {'nl': '$ct$ (lichtseconden)', 'en': '$ct$ (light-seconds)'},
+    'lc_sym_title': {
+        'nl': r'Lengtecontractie uit symmetrie ($\theta = %d°$)',
+        'en': r'Length contraction from symmetry ($\theta = %d°$)'},
+    'lc_sym_light': {'nl': 'licht ($45°$)', 'en': 'light ($45°$)'},
+    'lc_sym_td': {'nl': r'tijddilatatie: $\cos\theta$', 'en': r'time dilation: $\cos\theta$'},
+    'lc_sym_lc': {'nl': r'lengtecontractie: $\cos\theta$', 'en': r'length contraction: $\cos\theta$'},
+    'lc_sym_time_dir': {'nl': 'tijdrichting', 'en': 'time direction'},
+    'lc_sym_space_dir': {'nl': 'ruimterichting', 'en': 'space direction'},
 }
 
 
@@ -808,6 +816,109 @@ def unit_circle_diagram(theta_deg=30, lang='nl', figsize=(14, 6)):
     ax2.set_ylim(-0.55, 1.2)
 
     fig.suptitle(_t('unit_circle_title', lang), fontsize=13, y=1.02)
+    plt.tight_layout()
+    plt.show()
+    return fig
+
+
+# =============================================================================
+# 6b1b. Length contraction from light-line symmetry
+# =============================================================================
+
+def lc_symmetry_diagram(theta_deg=30, lang='nl', figsize=(7, 7)):
+    """Show that length contraction = time dilation, because light travels
+    at 45° in a spacetime diagram (ct vs x), making the axes symmetric.
+
+    The moving observer's time vector (sin θ, cos θ) projects cos θ onto ct.
+    The 45° light line mirrors this: the space vector (cos θ, -sin θ) projects
+    cos θ onto x.  Same factor, same geometry.
+    """
+    fig, ax = plt.subplots(1, 1, figsize=figsize)
+
+    theta = np.radians(theta_deg)
+    cos_t = np.cos(theta)
+    sin_t = np.sin(theta)
+
+    # --- Axes ---
+    ax_len = 1.25
+    ax.annotate('', xy=(ax_len, 0), xytext=(0, 0),
+                arrowprops=dict(arrowstyle='->', color='gray', lw=1.5))
+    ax.annotate('', xy=(0, ax_len), xytext=(0, 0),
+                arrowprops=dict(arrowstyle='->', color='gray', lw=1.5))
+    ax.text(ax_len + 0.03, -0.06, '$x$', fontsize=14, color='gray')
+    ax.text(-0.08, ax_len + 0.02, '$ct$', fontsize=14, color='gray')
+
+    # --- 45° light line ---
+    ax.plot([0, 1.15], [0, 1.15], color='#e6a817', lw=2, ls='--', alpha=0.7)
+    ax.text(0.95, 1.05, _t('lc_sym_light', lang),
+            fontsize=11, color='#c49000', rotation=45, ha='center',
+            style='italic')
+
+    # --- Mirror line label (optional subtle) ---
+    # The 45° line IS the mirror axis
+
+    # --- Time direction (blue) ---
+    tx, ty = sin_t, cos_t
+    ax.annotate('', xy=(tx, ty), xytext=(0, 0),
+                arrowprops=dict(arrowstyle='->', color='#2070c0', lw=2.5))
+    ax.text(tx + 0.05, ty + 0.04,
+            _t('lc_sym_time_dir', lang), fontsize=11, color='#2070c0',
+            style='italic')
+
+    # Projection onto ct-axis: cos θ (time dilation)
+    ax.plot([tx, 0], [ty, ty], '#2070c0', ls=':', lw=1.5, alpha=0.5)
+    ax.plot([0, 0], [0, ty], '#2070c0', lw=5, alpha=0.4)
+    ax.plot([-0.02, 0.02], [ty, ty], '#2070c0', lw=2)
+    ax.text(-0.06, ty, r'$\cos\theta$', fontsize=13, color='#2070c0',
+            ha='right', va='center', fontweight='bold')
+    ax.text(-0.06, ty / 2, _t('lc_sym_td', lang),
+            fontsize=9, color='#2070c0', ha='right', va='center',
+            rotation=90)
+
+    # --- Space direction (red) ---
+    sx, sy = cos_t, -sin_t
+    ax.annotate('', xy=(sx, sy), xytext=(0, 0),
+                arrowprops=dict(arrowstyle='->', color='#c04020', lw=2.5))
+    ax.text(sx + 0.04, sy - 0.07,
+            _t('lc_sym_space_dir', lang), fontsize=11, color='#c04020',
+            style='italic')
+
+    # Projection onto x-axis: cos θ (length contraction)
+    ax.plot([sx, sx], [sy, 0], '#c04020', ls=':', lw=1.5, alpha=0.5)
+    ax.plot([0, sx], [0, 0], '#c04020', lw=5, alpha=0.4)
+    ax.plot([sx, sx], [-0.02, 0.02], '#c04020', lw=2)
+    ax.text(sx, 0.06, r'$\cos\theta$', fontsize=13, color='#c04020',
+            ha='center', va='bottom', fontweight='bold')
+    ax.text(sx / 2, 0.06, _t('lc_sym_lc', lang),
+            fontsize=9, color='#c04020', ha='center', va='bottom')
+
+    # --- Mirror symmetry visual: dashed arcs showing the reflection ---
+    # Small right-angle mark between vectors
+    sq = 0.06
+    t_hat = np.array([tx, ty])
+    s_hat = np.array([sx, sy])
+    ax.plot([sq * t_hat[0], sq * (t_hat[0] + s_hat[0]), sq * s_hat[0]],
+            [sq * t_hat[1], sq * (t_hat[1] + s_hat[1]), sq * s_hat[1]],
+            'k-', lw=1)
+
+    # θ arc from ct-axis to time direction
+    arc = Arc((0, 0), 0.35, 0.35, angle=90, theta1=-theta_deg, theta2=0,
+              color='purple', lw=1.5)
+    ax.add_patch(arc)
+    ax.text(0.07, 0.22, r'$\theta$', fontsize=13, color='purple')
+
+    # θ arc from x-axis to space direction (mirror)
+    arc2 = Arc((0, 0), 0.35, 0.35, angle=0, theta1=-theta_deg, theta2=0,
+               color='purple', lw=1.5)
+    ax.add_patch(arc2)
+    ax.text(0.22, -0.07, r'$\theta$', fontsize=13, color='purple')
+
+    ax.set_title(_t('lc_sym_title', lang) % theta_deg, fontsize=14)
+    ax.set_aspect('equal')
+    ax.set_xlim(-0.25, 1.3)
+    ax.set_ylim(-0.55, 1.3)
+    ax.axis('off')
+
     plt.tight_layout()
     plt.show()
     return fig
