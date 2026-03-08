@@ -37,3 +37,4 @@ sphinx:
       - draft-watermark.css
     html_js_files:
       - https://cdn.plot.ly/plotly-2.35.2.min.js
+      - watermark.js
