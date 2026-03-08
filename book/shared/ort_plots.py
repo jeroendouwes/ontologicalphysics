@@ -1193,46 +1193,80 @@ def lorentz_decomposition_diagram(theta_deg=30, lang='nl', figsize=(14, 6)):
 # 7. c_local Profile
 # =============================================================================
 
-def c_local_profile(models, labels=None, r_range=None, lang='nl', figsize=(10, 6)):
+def c_local_profile(models, labels=None, surface_radii=None, r_range=None,
+                     lang='nl', figsize=(12, 5)):
     """
     Plot c_local(r)/c profile for one or more GravityModels.
+
+    Parameters
+    ----------
+    surface_radii : list of float, optional
+        Physical surface radius for each model (in meters).
+        When provided, the right panel shows c_local at each surface.
     """
-    fig, ax = plt.subplots(figsize=figsize)
+    if surface_radii is not None:
+        fig, (ax, ax2) = plt.subplots(1, 2, figsize=figsize)
+    else:
+        fig, ax = plt.subplots(figsize=(figsize[0] // 2, figsize[1]))
 
     if labels is None:
         labels = [f"M = {m.mass:.2e} kg" for m in models]
 
-    colors = plt.cm.Set1(np.linspace(0, 0.8, len(models)))
+    colors = ['#2070c0', '#c04020', '#20a050', '#a020c0']
 
-    for model, label, color in zip(models, labels, colors):
-        if r_range is None:
-            r_min = model.rs * 1.01
-            r_max = model.rs * 20
-            r = np.linspace(r_min, r_max, 1000)
-        else:
-            r = r_range
+    # Left panel: universal curve (r/rs)
+    r_norm_arr = np.linspace(1.01, 20, 1000)
+    c_loc_universal = np.sqrt(1 - 1 / r_norm_arr)
+    ax.plot(r_norm_arr, c_loc_universal, 'k-', linewidth=2,
+            label=r'$\sqrt{1 - r_s/r}$')
 
-        c_loc = np.array([model.c_local(ri) / C for ri in r])
-        r_norm = r / model.rs
-
-        ax.plot(r_norm, c_loc, label=label, color=color, linewidth=2)
-
-    ax.axhline(1.0, color='gray', linestyle='--', alpha=0.5, label='c')
+    ax.axhline(1.0, color='gray', linestyle='--', alpha=0.5)
     ax.axhline(0.0, color='red', linestyle='--', alpha=0.3)
     ax.axvline(1.0, color='red', linestyle=':', alpha=0.5,
                label=_t('event_horizon', lang))
 
     ax.set_xlabel(_t('radius', lang), fontsize=12)
     ax.set_ylabel(_t('c_local_label', lang), fontsize=12)
-    ax.set_title(_t('c_local_title', lang), fontsize=14, fontweight='bold')
+    ax.set_title(_t('c_local_title', lang), fontsize=13, fontweight='bold')
     ax.legend(fontsize=10)
     ax.set_xlim(0.5, 20)
     ax.set_ylim(-0.05, 1.1)
     ax.grid(True, alpha=0.3)
+
+    # Right panel: surface values per object
+    if surface_radii is not None:
+        bar_labels = []
+        bar_values = []
+        bar_colors = []
+        for model, label, r_surf, color in zip(models, labels, surface_radii,
+                                                 colors):
+            cl = model.c_local(r_surf) / C
+            bar_labels.append(label)
+            bar_values.append(cl)
+            bar_colors.append(color)
+
+        bars = ax2.bar(bar_labels, bar_values, color=bar_colors, alpha=0.8)
+        ax2.set_ylim(min(bar_values) - 0.0000005, 1.0000001)
+        ax2.axhline(1.0, color='gray', linestyle='--', alpha=0.5)
+        ax2.set_ylabel(_t('c_local_label', lang), fontsize=12)
+
+        title_r = {'nl': '$c_{local}/c$ aan het oppervlak',
+                    'en': '$c_{local}/c$ at surface'}
+        ax2.set_title(title_r.get(lang, title_r['en']), fontsize=13,
+                      fontweight='bold')
+
+        # Annotate exact values
+        for bar, val in zip(bars, bar_values):
+            diff = 1 - val
+            ax2.text(bar.get_x() + bar.get_width() / 2, val,
+                     f'{val:.10f}\n(1 - {diff:.2e})',
+                     ha='center', va='bottom', fontsize=9)
+
     try:
         plt.tight_layout()
     except ValueError:
         pass
+    plt.show()
     return fig
 
 
