@@ -1268,7 +1268,7 @@ def spatial_stretching_comparison(lang='nl', figsize=(12, 6)):
     Left panel: proper radial distance vs coordinate r
     Right panel: physical circumference vs coordinate r
     """
-    r_over_rs = np.linspace(1.01, 10, 500)
+    r_over_rs = np.linspace(1.01, 50, 500)
 
     # --- Proper radial distance (integrated from r_s to r) ---
     # Newton: dl = dr  →  L = r - r_s
@@ -1317,7 +1317,7 @@ def spatial_stretching_comparison(lang='nl', figsize=(12, 6)):
     ax1.set_title(title_radial, fontsize=13, fontweight='bold')
     ax1.legend(fontsize=11)
     ax1.grid(True, alpha=0.3)
-    ax1.set_xlim(1, 10)
+    ax1.set_xlim(1, 50)
 
     # Right panel: circumference
     ax2.plot(r_over_rs, circ_newton, 'b--', linewidth=2, label='Newton')
