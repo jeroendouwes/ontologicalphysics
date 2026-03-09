@@ -1265,67 +1265,68 @@ def c_local_profile_interactive(lang='nl'):
 def spatial_stretching_comparison(lang='nl', figsize=(12, 6)):
     """Two-panel plot comparing Newton, ART and ORT spatial stretching.
 
-    Left panel: y = r/r_s, x = radius inferred from local circumference
-        Newton/ART: r_local = r  (flat line on diagonal)
-        ORT: r_local = r/sqrt(1-r_s/r)  (diverges at r_s)
-    Right panel: y = r/r_s, x = physical circumference
-        Newton = ART: C = 2πr
-        ORT: C = 2πr/sqrt(1-r_s/r)  (diverges at r_s)
+    Left panel: x = r/r_s, y = proper radial distance from r_s
+        Newton: y = r - r_s  (straight line)
+        ART = ORT: y = integral of dr/sqrt(1-r_s/r)  (larger, both identical)
+    Right panel: x = r/r_s, y = physical circumference
+        Newton = ART: y = 2πr  (straight line)
+        ORT: y = 2πr/sqrt(1-r_s/r)  (diverges at r_s)
     """
     r_over_rs = np.linspace(1.01, 10, 500)
+    x = r_over_rs  # r/r_s
 
-    # --- Radius inferred from local circumference ---
-    # Newton: r_local = r  (flat space)
-    r_local_newton = r_over_rs
+    # --- Left: proper radial distance (integrated from r_s to r) ---
+    # Newton: dl = dr  →  L = r - r_s
+    radial_newton = x - 1.0
 
-    # ART (Schwarzschild): C = 2πr, so r_local = r
-    r_local_art = r_over_rs
+    # ART = ORT: dl = dr/sqrt(1 - r_s/r)
+    # Integral: L/r_s = sqrt(x(x-1)) + ln(sqrt(x-1) + sqrt(x))
+    radial_art_ort = np.sqrt(x * (x - 1)) + np.log(np.sqrt(x - 1) + np.sqrt(x))
 
-    # ORT (isotropic): C = 2πr/sqrt(1-r_s/r), so r_local = r/sqrt(1-r_s/r)
-    r_local_ort = r_over_rs / np.sqrt(1 - 1.0 / r_over_rs)
+    # --- Right: physical circumference ---
+    # Newton = ART: C = 2πr
+    circ_newton_art = 2 * np.pi * x
 
-    # --- Physical circumference ---
-    circ_newton = 2 * np.pi * r_over_rs
-    circ_art = 2 * np.pi * r_over_rs
-    circ_ort = 2 * np.pi * r_over_rs / np.sqrt(1 - 1.0 / r_over_rs)
+    # ORT (isotropic): C = 2πr / sqrt(1 - r_s/r)
+    circ_ort = 2 * np.pi * x / np.sqrt(1 - 1.0 / x)
 
     # --- Labels ---
     if lang == 'nl':
-        title_radius = 'Lokale straal (uit omtrek)'
+        title_radial = 'Eigenafstand (radiaal)'
         title_circ = 'Fysieke omtrek'
-        ylabel = r'Coördinaat $r / r_s$'
-        xlabel_radius = r'$r_{lokaal} / r_s$'
-        xlabel_circ = r'Omtrek [$r_s$]'
+        xlabel = r'Coördinaat $r / r_s$'
+        ylabel_radial = r'Eigenafstand vanaf $r_s$ [$r_s$]'
+        ylabel_circ = r'Omtrek [$r_s$]'
     else:
-        title_radius = 'Local radius (from circumference)'
+        title_radial = 'Proper radial distance'
         title_circ = 'Physical circumference'
-        ylabel = r'Coordinate $r / r_s$'
-        xlabel_radius = r'$r_{local} / r_s$'
-        xlabel_circ = r'Circumference [$r_s$]'
+        xlabel = r'Coordinate $r / r_s$'
+        ylabel_radial = r'Proper distance from $r_s$ [$r_s$]'
+        ylabel_circ = r'Circumference [$r_s$]'
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=figsize)
 
-    # Left panel: y = r, x = local radius (from circumference)
-    ax1.plot(r_local_newton, r_over_rs, 'b--', linewidth=2, label='Newton = ART')
-    ax1.plot(r_local_ort, r_over_rs, 'g-', linewidth=2, label='ORT')
-    ax1.set_xlabel(xlabel_radius, fontsize=12)
-    ax1.set_ylabel(ylabel, fontsize=12)
-    ax1.set_title(title_radius, fontsize=13, fontweight='bold')
+    # Left panel: radial eigenafstand (ART = ORT, Newton different)
+    ax1.plot(x, radial_newton, 'b--', linewidth=2, label='Newton')
+    ax1.plot(x, radial_art_ort, 'r-', linewidth=2, label='ART = ORT')
+    ax1.set_xlabel(xlabel, fontsize=12)
+    ax1.set_ylabel(ylabel_radial, fontsize=12)
+    ax1.set_title(title_radial, fontsize=13, fontweight='bold')
     ax1.legend(fontsize=11)
     ax1.grid(True, alpha=0.3)
-    ax1.set_xlim(0, 15)
-    ax1.set_ylim(1, 10)
+    ax1.set_xlim(0, 10)
+    ax1.set_ylim(0, None)
 
-    # Right panel: y = r, x = circumference
-    ax2.plot(circ_newton, r_over_rs, 'b--', linewidth=2, label='Newton = ART')
-    ax2.plot(circ_ort, r_over_rs, 'g-', linewidth=2, label='ORT')
-    ax2.set_xlabel(xlabel_circ, fontsize=12)
-    ax2.set_ylabel(ylabel, fontsize=12)
+    # Right panel: circumference (Newton = ART, ORT different)
+    ax2.plot(x, circ_newton_art, 'b--', linewidth=2, label='Newton = ART')
+    ax2.plot(x, circ_ort, 'g-', linewidth=2, label='ORT')
+    ax2.set_xlabel(xlabel, fontsize=12)
+    ax2.set_ylabel(ylabel_circ, fontsize=12)
     ax2.set_title(title_circ, fontsize=13, fontweight='bold')
     ax2.legend(fontsize=11)
     ax2.grid(True, alpha=0.3)
-    ax2.set_xlim(0, 2 * np.pi * 15)
-    ax2.set_ylim(1, 10)
+    ax2.set_xlim(0, 10)
+    ax2.set_ylim(0, 2 * np.pi * 12)
 
     plt.tight_layout()
     plt.show()
