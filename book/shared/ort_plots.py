@@ -1262,11 +1262,9 @@ def c_local_profile_interactive(lang='nl'):
 # 8. Spacetime Embedding (Flamm's Paraboloid)
 # =============================================================================
 
-def spacetime_embedding_3d(mass=None, lang='nl'):
-    """3D Flamm's paraboloid using plotly."""
-    if not HAS_PLOTLY:
-        print("plotly not available")
-        return
+def spacetime_embedding_3d(mass=None, lang='nl', figsize=(9, 7)):
+    """3D Flamm's paraboloid using matplotlib (static, works in jupyter-book)."""
+    from mpl_toolkits.mplot3d import Axes3D
 
     if mass is None:
         mass = M_SUN
@@ -1281,14 +1279,17 @@ def spacetime_embedding_3d(mass=None, lang='nl'):
     X = R * np.cos(Theta) / rs
     Y = R * np.sin(Theta) / rs
 
-    fig = go.Figure(data=[go.Surface(x=X, y=Y, z=Z/rs,
-                                      colorscale='Viridis', opacity=0.8)])
-    fig.update_layout(
-        title=_t('embedding_title', lang),
-        scene=dict(xaxis_title='x/r_s', yaxis_title='y/r_s', zaxis_title='z/r_s',
-                   aspectmode='data'),
-        width=700, height=600
-    )
+    fig = plt.figure(figsize=figsize)
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_surface(X, Y, Z / rs, cmap='viridis', alpha=0.8,
+                    edgecolor='none', rcount=100, ccount=100)
+    ax.set_xlabel('x / $r_s$', fontsize=11)
+    ax.set_ylabel('y / $r_s$', fontsize=11)
+    ax.set_zlabel('z / $r_s$', fontsize=11)
+    ax.set_title(_t('embedding_title', lang), fontsize=14, fontweight='bold')
+    ax.view_init(elev=25, azim=-60)
+    plt.tight_layout()
+    plt.show()
     return fig
 
 
