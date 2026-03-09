@@ -1259,7 +1259,83 @@ def c_local_profile_interactive(lang='nl'):
 
 
 # =============================================================================
-# 8. Spacetime Embedding (Flamm's Paraboloid)
+# 8a. Isotropic vs Anisotropic Spatial Stretching
+# =============================================================================
+
+def spatial_stretching_comparison(lang='nl', figsize=(12, 6)):
+    """Two-panel plot comparing Newton, ART and ORT spatial stretching.
+
+    Left panel: proper radial distance vs coordinate r
+    Right panel: physical circumference vs coordinate r
+    """
+    r_over_rs = np.linspace(1.01, 10, 500)
+
+    # --- Proper radial distance (integrated from r_s to r) ---
+    # Newton: dl = dr  →  L = r - r_s
+    radial_newton = r_over_rs - 1.0
+
+    # ART (Schwarzschild): dl = dr/sqrt(1 - r_s/r)
+    # Integral: L = sqrt(r(r-r_s)) + r_s * ln(sqrt(r/r_s - 1) + sqrt(r/r_s))
+    x = r_over_rs  # r/r_s
+    radial_art = np.sqrt(x * (x - 1)) + np.log(np.sqrt(x - 1) + np.sqrt(x))
+
+    # ORT (isotropic): dl = dr/sqrt(1 - r_s/r)  (same radial integral as ART
+    # for the radial direction — the difference shows in the circumference)
+    radial_ort = radial_art  # radial stretching is the same
+
+    # --- Physical circumference ---
+    # Newton: C = 2πr
+    circ_newton = 2 * np.pi * r_over_rs
+
+    # ART (Schwarzschild coords): C = 2πr  (unchanged!)
+    circ_art = 2 * np.pi * r_over_rs
+
+    # ORT (isotropic): C = 2πr / sqrt(1 - r_s/r)
+    circ_ort = 2 * np.pi * r_over_rs / np.sqrt(1 - 1.0 / r_over_rs)
+
+    # --- Labels ---
+    if lang == 'nl':
+        title_radial = 'Eigenafstand (radiaal)'
+        title_circ = 'Fysieke omtrek'
+        xlabel = r'Coördinaat $r / r_s$'
+        ylabel_radial = r'Eigenafstand vanaf $r_s$ [$r_s$]'
+        ylabel_circ = r'Omtrek [$r_s$]'
+    else:
+        title_radial = 'Proper radial distance'
+        title_circ = 'Physical circumference'
+        xlabel = r'Coordinate $r / r_s$'
+        ylabel_radial = r'Proper distance from $r_s$ [$r_s$]'
+        ylabel_circ = r'Circumference [$r_s$]'
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=figsize)
+
+    # Left panel: radial distance (ART and ORT are identical here)
+    ax1.plot(r_over_rs, radial_newton, 'b--', linewidth=2, label='Newton')
+    ax1.plot(r_over_rs, radial_art, 'r-', linewidth=2, label='ART = ORT')
+    ax1.set_xlabel(xlabel, fontsize=12)
+    ax1.set_ylabel(ylabel_radial, fontsize=12)
+    ax1.set_title(title_radial, fontsize=13, fontweight='bold')
+    ax1.legend(fontsize=11)
+    ax1.grid(True, alpha=0.3)
+    ax1.set_xlim(1, 10)
+
+    # Right panel: circumference
+    ax2.plot(r_over_rs, circ_newton, 'b--', linewidth=2, label='Newton')
+    ax2.plot(r_over_rs, circ_art, 'r-', linewidth=2, label='ART')
+    ax2.plot(r_over_rs, circ_ort, 'g-', linewidth=2, label='ORT')
+    ax2.set_xlabel(xlabel, fontsize=12)
+    ax2.set_ylabel(ylabel_circ, fontsize=12)
+    ax2.set_title(title_circ, fontsize=13, fontweight='bold')
+    ax2.legend(fontsize=11)
+    ax2.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+    return fig
+
+
+# =============================================================================
+# 8b. Spacetime Embedding (Flamm's Paraboloid)
 # =============================================================================
 
 def spacetime_embedding_3d(mass=None, lang='nl', figsize=(9, 7)):
