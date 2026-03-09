@@ -1283,6 +1283,10 @@ def spacetime_embedding_3d(mass=None, lang='nl', figsize=(9, 7)):
     ax = fig.add_subplot(111, projection='3d')
     ax.plot_surface(X, Y, Z / rs, cmap='viridis', alpha=0.8,
                     edgecolor='none', rcount=100, ccount=100)
+    # Symmetric axis limits so the funnel is visually centered
+    lim = 10
+    ax.set_xlim(-lim, lim)
+    ax.set_ylim(-lim, lim)
     ax.set_xlabel('x / $r_s$', fontsize=11)
     ax.set_ylabel('y / $r_s$', fontsize=11)
     ax.set_zlabel('z / $r_s$', fontsize=11)
