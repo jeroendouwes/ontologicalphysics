@@ -979,6 +979,207 @@ def gw_strain(r, m_chirp, f):
 
 
 # =============================================================================
+# Multi-mass gravity: v_stroom / v_iso decomposition
+# =============================================================================
+
+class MultiGravity:
+    """
+    Gravity from multiple point masses.
+
+    Decomposes the gravitational energy parameter v_grav into:
+    - v_stroom (directed): the "river flow" from the net gravitational field
+    - v_iso (isotropic): the remaining potential with no preferred direction
+
+    Formula:
+        c² = v_tijd² + (v_ruimte + v_stroom)² + v_iso²
+
+    The decomposition uses:
+        v_stroom² = -4·|g|² / (dg/ds along g)
+        v_iso²    = v_grav² - v_stroom²
+
+    where g is the total gravitational field and dg/ds is the
+    directional derivative of |g| along the field direction (tidal term).
+    """
+
+    def __init__(self, masses, positions):
+        """
+        Parameters:
+            masses:    list of masses [kg]
+            positions: list of (x, y) positions [m]
+        """
+        self.masses = list(masses)
+        self.positions = [tuple(p) for p in positions]
+        self.n = len(masses)
+
+    def _distances_and_directions(self, px, py):
+        """Compute distances and unit vectors from each mass to point P."""
+        results = []
+        for i in range(self.n):
+            mx, my = self.positions[i]
+            dx = px - mx
+            dy = py - my
+            r = math.sqrt(dx**2 + dy**2)
+            if r < 1e-20:
+                results.append((r, 0.0, 0.0))
+            else:
+                results.append((r, dx/r, dy/r))
+        return results
+
+    def phi(self, px, py):
+        """Total gravitational potential Phi = sum(G·M_i/r_i) at point (px, py)."""
+        total = 0.0
+        for i, (r, _, _) in enumerate(self._distances_and_directions(px, py)):
+            if r > 1e-20:
+                total += G * self.masses[i] / r
+        return total
+
+    def v_grav_squared(self, px, py):
+        """Total gravitational energy parameter v_grav² = 2·Phi."""
+        return 2.0 * self.phi(px, py)
+
+    def g_field(self, px, py):
+        """Total gravitational field g = sum(G·M_i/r_i² · direction_i).
+        Returns (gx, gy) pointing from masses toward P."""
+        gx, gy = 0.0, 0.0
+        for i, (r, ux, uy) in enumerate(self._distances_and_directions(px, py)):
+            if r > 1e-20:
+                gi = G * self.masses[i] / r**2
+                gx += gi * ux
+                gy += gi * uy
+        return gx, gy
+
+    def g_magnitude(self, px, py):
+        """Magnitude of total gravitational field |g|."""
+        gx, gy = self.g_field(px, py)
+        return math.sqrt(gx**2 + gy**2)
+
+    def tidal_along_g(self, px, py, eps=None):
+        """Directional derivative of |g| along g direction: dg/ds.
+
+        This is the tidal term needed for v_stroom² = -4·|g|²/(dg/ds).
+        Computed numerically via finite difference.
+        """
+        gx, gy = self.g_field(px, py)
+        g_mag = math.sqrt(gx**2 + gy**2)
+        if g_mag < 1e-30:
+            return 0.0
+
+        # Unit vector along g
+        g_hat_x = gx / g_mag
+        g_hat_y = gy / g_mag
+
+        # Step size: adaptive based on nearest mass distance
+        if eps is None:
+            dists = [r for r, _, _ in self._distances_and_directions(px, py)]
+            r_min = min(d for d in dists if d > 1e-20)
+            eps = r_min * 1e-6
+
+        # Finite difference along g direction
+        g_plus = self.g_magnitude(px + eps * g_hat_x, py + eps * g_hat_y)
+        g_minus = self.g_magnitude(px - eps * g_hat_x, py - eps * g_hat_y)
+        return (g_plus - g_minus) / (2 * eps)
+
+    def decompose(self, px, py):
+        """Decompose v_grav into v_stroom (directed) and v_iso (isotropic).
+
+        Returns dict with:
+            v_grav2:      v_grav² = 2·Phi
+            v_stroom2:    v_stroom² (directed part)
+            v_iso2:       v_iso² (isotropic part)
+            v_stroom_dir: (ux, uy) unit vector of v_stroom direction
+            g_field:      (gx, gy) gravitational field
+            g_mag:        |g|
+        """
+        v_grav2 = self.v_grav_squared(px, py)
+        gx, gy = self.g_field(px, py)
+        g_mag = math.sqrt(gx**2 + gy**2)
+
+        if g_mag < 1e-30:
+            return {
+                'v_grav2': v_grav2,
+                'v_stroom2': 0.0,
+                'v_iso2': v_grav2,
+                'v_stroom_dir': (0.0, 0.0),
+                'g_field': (gx, gy),
+                'g_mag': g_mag,
+            }
+
+        dg_ds = self.tidal_along_g(px, py)
+
+        if abs(dg_ds) < 1e-30:
+            v_stroom2 = 0.0
+        else:
+            v_stroom2 = -4.0 * g_mag**2 / dg_ds
+
+        # Clamp: v_stroom² cannot exceed v_grav² or be negative
+        v_stroom2 = max(0.0, min(v_stroom2, v_grav2))
+        v_iso2 = v_grav2 - v_stroom2
+
+        g_hat_x = gx / g_mag
+        g_hat_y = gy / g_mag
+
+        return {
+            'v_grav2': v_grav2,
+            'v_stroom2': v_stroom2,
+            'v_iso2': v_iso2,
+            'v_stroom_dir': (g_hat_x, g_hat_y),
+            'g_field': (gx, gy),
+            'g_mag': g_mag,
+        }
+
+    def c_local(self, px, py):
+        """Local speed of light c_local = sqrt(c² - v_grav²)."""
+        v_grav2 = self.v_grav_squared(px, py)
+        val = C**2 - v_grav2
+        return math.sqrt(max(0.0, val))
+
+    def c_local_grid(self, x_arr, y_arr):
+        """Compute c_local on a 2D grid. Returns 2D array."""
+        import numpy as np
+        result = np.zeros((len(y_arr), len(x_arr)))
+        for j, y in enumerate(y_arr):
+            for i, x in enumerate(x_arr):
+                result[j, i] = self.c_local(x, y)
+        return result
+
+    def decompose_grid(self, x_arr, y_arr):
+        """Compute decomposition on a 2D grid.
+        Returns dict of 2D arrays for v_stroom, v_iso, g_field, etc."""
+        import numpy as np
+        nx, ny = len(x_arr), len(y_arr)
+        v_stroom = np.zeros((ny, nx))
+        v_iso = np.zeros((ny, nx))
+        v_grav = np.zeros((ny, nx))
+        gx_arr = np.zeros((ny, nx))
+        gy_arr = np.zeros((ny, nx))
+        stroom_x = np.zeros((ny, nx))
+        stroom_y = np.zeros((ny, nx))
+
+        for j, y in enumerate(y_arr):
+            for i, x in enumerate(x_arr):
+                d = self.decompose(x, y)
+                v_grav[j, i] = math.sqrt(d['v_grav2'])
+                v_stroom[j, i] = math.sqrt(d['v_stroom2'])
+                v_iso[j, i] = math.sqrt(d['v_iso2'])
+                gx_arr[j, i] = d['g_field'][0]
+                gy_arr[j, i] = d['g_field'][1]
+                sx, sy = d['v_stroom_dir']
+                vs = math.sqrt(d['v_stroom2'])
+                stroom_x[j, i] = vs * sx
+                stroom_y[j, i] = vs * sy
+
+        return {
+            'v_grav': v_grav,
+            'v_stroom': v_stroom,
+            'v_iso': v_iso,
+            'gx': gx_arr,
+            'gy': gy_arr,
+            'stroom_x': stroom_x,
+            'stroom_y': stroom_y,
+        }
+
+
+# =============================================================================
 # Predefined model instances for common objects
 # =============================================================================
 
