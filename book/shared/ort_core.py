@@ -1179,6 +1179,97 @@ class MultiGravity:
         }
 
 
+class SphericalMassDistribution:
+    """
+    Spherically symmetric continuous mass distribution.
+
+    Given a density profile rho(r), computes the gravitational potential,
+    field, and the v_grav / v_netto decomposition at any point.
+
+    For a point at radius r from the center:
+    - M_in(r) = integral of 4·pi·r'²·rho(r') from 0 to r
+    - Phi_in(r) = G·M_in(r) / r
+    - Phi_out(r) = G · integral of 4·pi·r'·rho(r') from r to R_max
+    - g(r) = G·M_in(r) / r²  (only inner mass contributes)
+    - v_grav² = 2·(Phi_in + Phi_out)
+    - v_netto² from g (directed, only inner mass)
+    - isotroop deel = v_grav² - v_netto²
+    """
+
+    def __init__(self, rho_func, R_max, N_shells=1000):
+        """
+        Parameters:
+            rho_func: density function rho(r) [kg/m³]
+            R_max:    outer radius of the distribution [m]
+            N_shells: number of shells for numerical integration
+        """
+        self.rho_func = rho_func
+        self.R_max = R_max
+        self.N = N_shells
+
+        # Precompute shell data
+        self.dr = R_max / N_shells
+        self.r_shells = [(i + 0.5) * self.dr for i in range(N_shells)]
+        self.dm_shells = [rho_func(r) * 4 * math.pi * r**2 * self.dr
+                          for r in self.r_shells]
+        self.M_total = sum(self.dm_shells)
+
+    def M_enclosed(self, r):
+        """Mass enclosed within radius r."""
+        total = 0.0
+        for i, rs in enumerate(self.r_shells):
+            if rs <= r:
+                total += self.dm_shells[i]
+        return total
+
+    def phi_total(self, r):
+        """Total gravitational potential at radius r."""
+        phi_in = 0.0
+        phi_out = 0.0
+        for i, rs in enumerate(self.r_shells):
+            if rs <= r:
+                phi_in += self.dm_shells[i]
+            else:
+                phi_out += G * self.dm_shells[i] / rs
+        if r > 1e-20:
+            phi_in = G * phi_in / r
+        return phi_in + phi_out
+
+    def g_magnitude(self, r):
+        """Gravitational field magnitude at radius r."""
+        if r < 1e-20:
+            return 0.0
+        return G * self.M_enclosed(r) / r**2
+
+    def decompose(self, r):
+        """Decompose at radius r.
+        Returns dict with v_grav, v_netto, v_iso, g, c_local."""
+        phi = self.phi_total(r)
+        v_grav2 = 2 * phi
+        g = self.g_magnitude(r)
+
+        if g < 1e-30 or r < 1e-20:
+            v_netto2 = 0.0
+        else:
+            # v_netto² = 2·g·r = 2·G·M_in/r (for spherical symmetry)
+            v_netto2 = 2 * g * r
+
+        v_netto2 = min(v_netto2, v_grav2)
+        v_iso2 = v_grav2 - v_netto2
+
+        c_loc = math.sqrt(max(0.0, C**2 - v_grav2))
+
+        return {
+            'v_grav': math.sqrt(max(0.0, v_grav2)),
+            'v_netto': math.sqrt(max(0.0, v_netto2)),
+            'v_iso': math.sqrt(max(0.0, v_iso2)),
+            'g': g,
+            'c_local': c_loc,
+            'M_enclosed': self.M_enclosed(r),
+            'phi_total': phi,
+        }
+
+
 # =============================================================================
 # Predefined model instances for common objects
 # =============================================================================
