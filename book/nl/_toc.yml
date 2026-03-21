@@ -6,6 +6,7 @@ parts:
       - file: 01_speciale_relativiteit
       - file: 02_zwaartekracht_basis
       - file: 03_zwaartekracht_gevorderd
+      - file: 06_meervoudige_massa
   # Verdere Onderwerpen — pas tonen als ze klaar zijn:
   # - caption: "Verdere Onderwerpen"
   #   chapters:
