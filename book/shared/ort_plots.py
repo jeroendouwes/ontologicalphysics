@@ -1367,11 +1367,8 @@ def spatial_stretching_comparison(lang='nl', figsize=(12, 6)):
     radial_art_ort = np.sqrt(x * (x - 1)) + np.log(np.sqrt(x - 1) + np.sqrt(x))
 
     # --- Right: physical circumference ---
-    # Newton = ART: C = 2πr
-    circ_newton_art = 2 * np.pi * x
-
-    # ORT (isotropic): C = 2πr / sqrt(1 - r_s/r)
-    circ_ort = 2 * np.pi * x / np.sqrt(1 - 1.0 / x)
+    # Newton = ART = ORT: C = 2πr (geen tangentiële uitrekking)
+    circ_all = 2 * np.pi * x
 
     # --- Labels ---
     if lang == 'nl':
@@ -1400,9 +1397,8 @@ def spatial_stretching_comparison(lang='nl', figsize=(12, 6)):
     ax1.set_xlim(0, 10)
     ax1.set_ylim(0, None)
 
-    # Right panel: circumference (Newton = ART, ORT different)
-    ax2.plot(x, circ_newton_art, 'b--', linewidth=2, label='Newton = ART')
-    ax2.plot(x, circ_ort, 'g-', linewidth=2, label='ORT')
+    # Right panel: circumference (Newton = ART = ORT, all identical)
+    ax2.plot(x, circ_all, 'k-', linewidth=2, label='Newton = ART = ORT')
     ax2.set_xlabel(xlabel, fontsize=12)
     ax2.set_ylabel(ylabel_circ, fontsize=12)
     ax2.set_title(title_circ, fontsize=13, fontweight='bold')
