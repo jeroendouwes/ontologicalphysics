@@ -1263,55 +1263,54 @@ def c_local_profile_interactive(lang='nl'):
 # =============================================================================
 
 def light_speed_observers(lang='nl', figsize=(12, 6)):
-    """Two-panel plot showing coordinate light speed as seen by far-away observer,
-    compared to local observer who always measures c.
+    """Two-panel plot showing coordinate light speed as seen by far-away observer.
 
-    Left: ART (Schwarzschild) — anisotropic coordinate light speed
-    Right: ORT (isotropic) — isotropic coordinate light speed
+    Left: ART (Schwarzschild coordinates) — 2 curves (radial symmetric, tangential)
+    Right: ORT (Gullstrand-Painlevé) — 3 curves (radial out, radial in, tangential)
     """
     r_over_rs = np.linspace(1.01, 8, 500)
-    f = 1 - 1.0 / r_over_rs  # (1 - r_s/r)
+    f = 1 - 1.0 / r_over_rs        # (1 - r_s/r)
+    v_grav = np.sqrt(1.0 / r_over_rs)  # v_grav/c = sqrt(r_s/r)
 
-    # Coordinate light speeds (what far-away observer sees)
-    # ART
-    art_radial = f                # c(1-r_s/r) — slowed by time dilation AND spatial stretching
-    art_tangential = np.sqrt(f)   # c√(1-r_s/r) — slowed by time dilation only
+    # ART (Schwarzschild coordinates)
+    art_radial = f                  # c(1-r_s/r) — symmetric in/out
+    art_tangential = np.sqrt(f)     # c√(1-r_s/r)
 
-    # ORT (isotropic stretching)
-    ort_all = f                   # c(1-r_s/r) — same in all directions
+    # ORT (GP coordinates)
+    ort_tangential = np.sqrt(f)     # c√(1-r_s/r) = c_local
+    ort_radial_out = 1 - v_grav     # c(1-√(r_s/r)) — against the flow
+    ort_radial_in = 1 + v_grav      # c(1+√(r_s/r)) — with the flow
 
     # Local observer always measures c
     local_c = np.ones_like(r_over_rs)
 
     if lang == 'nl':
-        title_art = 'ART (Schwarzschild)'
-        title_ort = 'ORT (isotroop)'
+        title_art = 'ART (Schwarzschild-coördinaten)'
+        title_ort = 'ORT (Gullstrand-Painlevé)'
         xlabel = r'Afstand $r / r_s$'
         ylabel = r'Lichtsnelheid / $c$'
-        label_radial = 'Radiaal'
         label_tangential = 'Tangentieel'
-        label_all = 'Alle richtingen'
+        label_radial = 'Radiaal'
+        label_radial_out = 'Radiaal naar buiten'
+        label_radial_in = 'Radiaal naar binnen'
         label_local = 'Lokale waarnemer (altijd c)'
-        label_far = 'Verre waarnemer ziet:'
     else:
-        title_art = 'GR (Schwarzschild)'
-        title_ort = 'ORT (isotropic)'
+        title_art = 'GR (Schwarzschild coordinates)'
+        title_ort = 'ORT (Gullstrand-Painlevé)'
         xlabel = r'Distance $r / r_s$'
         ylabel = r'Light speed / $c$'
-        label_radial = 'Radial'
         label_tangential = 'Tangential'
-        label_all = 'All directions'
+        label_radial = 'Radial'
+        label_radial_out = 'Radial outward'
+        label_radial_in = 'Radial inward'
         label_local = 'Local observer (always c)'
-        label_far = 'Far-away observer sees:'
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=figsize)
 
-    # Left: ART — anisotropic
+    # Left: ART — 2 curves
     ax1.plot(r_over_rs, local_c, 'k-', linewidth=2, label=label_local)
-    ax1.plot(r_over_rs, art_tangential, 'b-', linewidth=2,
-             label=f'{label_far} {label_tangential.lower()}')
-    ax1.plot(r_over_rs, art_radial, 'r--', linewidth=2,
-             label=f'{label_far} {label_radial.lower()}')
+    ax1.plot(r_over_rs, art_tangential, 'b-', linewidth=2, label=label_tangential)
+    ax1.plot(r_over_rs, art_radial, 'r--', linewidth=2, label=label_radial)
     ax1.fill_between(r_over_rs, art_radial, art_tangential, alpha=0.15, color='purple')
     ax1.set_xlabel(xlabel, fontsize=12)
     ax1.set_ylabel(ylabel, fontsize=12)
@@ -1319,20 +1318,22 @@ def light_speed_observers(lang='nl', figsize=(12, 6)):
     ax1.legend(fontsize=10, loc='center right')
     ax1.grid(True, alpha=0.3)
     ax1.set_xlim(1, 8)
-    ax1.set_ylim(0, 1.1)
+    ax1.set_ylim(0, 2.1)
     ax1.axhline(y=1, color='gray', linewidth=0.5, linestyle=':')
 
-    # Right: ORT — isotropic
+    # Right: ORT — 3 curves
     ax2.plot(r_over_rs, local_c, 'k-', linewidth=2, label=label_local)
-    ax2.plot(r_over_rs, ort_all, 'g-', linewidth=2,
-             label=f'{label_far} {label_all.lower()}')
+    ax2.plot(r_over_rs, ort_tangential, 'b-', linewidth=2, label=label_tangential)
+    ax2.plot(r_over_rs, ort_radial_out, 'r--', linewidth=2, label=label_radial_out)
+    ax2.plot(r_over_rs, ort_radial_in, 'g-.', linewidth=2, label=label_radial_in)
+    ax2.fill_between(r_over_rs, ort_radial_out, ort_radial_in, alpha=0.1, color='purple')
     ax2.set_xlabel(xlabel, fontsize=12)
     ax2.set_ylabel(ylabel, fontsize=12)
     ax2.set_title(title_ort, fontsize=13, fontweight='bold')
     ax2.legend(fontsize=10, loc='center right')
     ax2.grid(True, alpha=0.3)
     ax2.set_xlim(1, 8)
-    ax2.set_ylim(0, 1.1)
+    ax2.set_ylim(0, 2.1)
     ax2.axhline(y=1, color='gray', linewidth=0.5, linestyle=':')
 
     plt.tight_layout()
