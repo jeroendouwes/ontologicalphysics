@@ -7,6 +7,7 @@ parts:
       - file: 02_zwaartekracht_basis
       - file: 06_meervoudige_massa
       - file: 07_geladen_massa
+      - file: 08_roterende_massa
       - file: 03_zwaartekracht_gevorderd
   # Verdere Onderwerpen — pas tonen als ze klaar zijn:
   # - caption: "Verdere Onderwerpen"
