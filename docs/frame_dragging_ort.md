@@ -23,8 +23,10 @@ Dat is tegen de rotatierichting in.
 
 ### 3. Behoud van impulsmoment (instroom)
 Als ruimte naar binnen stroomt en de massa draait, moet het
-impulsmoment behouden blijven. Maar: ruimte is geen materie —
-het is onduidelijk of impulsmoment op deze manier overdraagbaar is.
+impulsmoment behouden blijven. Maar: frame-dragging komt van het
+impulsmoment van de centrale massa zelf, niet van instromende materie.
+En ruimte is geen materie — het is onduidelijk of impulsmoment op
+deze manier overdraagbaar is.
 
 ## De aberratie-afleiding (veelbelovend)
 
@@ -78,11 +80,13 @@ Buiten de schil:
 
 ## Verbinding met kosmologie
 
+- Het heelal zelf kan initieel impulsmoment gehad hebben
 - Inflatie vergroot de straal met factor ~e^60
-- Behoud van impulsmoment: omega proportioneel 1/r^2
+- Behoud van impulsmoment van het heelal: omega proportioneel 1/r^2
 - Na inflatie: omega daalt met e^120 → effectief nul
-- Aberratie-effect (proportioneel v_rot/c) daalt mee
 - Verklaart waarom het heelal geen netto rotatie heeft
+- NB: dit is behoud van impulsmoment van de massa zelf, niet van
+  instromende ruimte
 
 ## EM-analogie
 
